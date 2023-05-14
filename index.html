@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+
+<head>
+    <!-- Import style -->
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+    <!-- Import Vue 3 -->
+    <script src="https://unpkg.com/vue@3"></script>
+    <!-- Import component library -->
+    <script src="https://unpkg.com/element-plus"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+
+
+</head>
+
+<body>
+    <header class="flex justify-between items-center bg-pink-600 p-4">
+        <div id="logo" class="logo">
+            <el-icon>
+                <CoffeeCup />
+            </el-icon>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div class="search">
+                <input type="text" placeholder="搜索..." class="bg-gray-200 px-4 py-2 rounded-l-lg">
+                <button class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600">搜索</button>
+            </div>
+            <div class="post">
+                <button class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 shadow-lg">投稿</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex">
+        <nav class="bg-blue-500 text-white p-4 fixed top-16 left-0 bottom-0 w-48 rounded-r-lg">
+
+            <div class="bg-sky-300 rounded-lg shadow-lg">
+                <ul class=" hidden md:block list-none m-0 p-0">
+                    <li class="my-2 "><a href="#"
+                            class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:drop-shadow-lg">分类1</a></li>
+                    <li class="my-2 "><a href="#"
+                            class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:shadow-lg">分类2</a></li>
+                    <li class="my-2 "><a href="#"
+                            class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:shadow-lg">分类3</a></li>
+                    <li class="my-2 "><a href="#"
+                            class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:shadow-lg">分类4</a></li>
+                </ul>
+            </div>
+        </nav>
+        <main class="mx-60 w-60 h-60">
+
+
+            <div class="h-64 flex items-center justify-center">
+                <button class="w-12 h-12 rounded-lg text-lg bg-slate-500" @click="onclick">test</button>
+                <el-empty description="mydx" />
+            </div>
+            <el-skeleton />
+            <br />
+            <div id="app">
+                <div v-if="!loaded">
+                    <el-skeleton :rows="5" animated />
+                </div>
+
+                <div v-else>
+                    <!-- 加载完成后显示的内容 -->
+                    <button class="w-12 h-12 bg-slate-500 rounded-full">66</button>
+                </div>
+            </div>
+
+
+        </main>
+
+
+        <script>
+
+            const app = Vue.createApp({
+                data() {
+                    return {
+                        loaded: false, // 是否加载完成的标志位
+                    };
+                },
+                mounted() {
+                    setTimeout(() => {
+                        this.loaded = true;
+                    }, 2000);
+                },
+                methods: {
+                    onclick() {
+                        alert('test');
+                    }
+                }
+
+
+            })
+            app.use(ElementPlus)
+            app.mount('#app');
+        </script>
+
+        <style>
+            @media (min-width: 768px) {
+
+                /* 如果屏幕宽度大于等于 768px，显示导航栏 */
+                nav {
+                    display: block !important;
+                }
+
+                main {
+                    margin-left: 56px;
+                    /* 导航栏的宽度 */
+                }
+            }
+
+            @media (max-width: 767px) {
+
+                /* 如果屏幕宽度小于 768px，隐藏导航栏 */
+                nav {
+                    display: none !important;
+                }
+
+                main {
+                    margin: 0 auto;
+                    /* 居中 */
+                }
+            }
+
+            #main.center {
+                display: flex;
+                justify-content: center;
+            }
+
+            nav {
+                transition: opacity 2s ease-out;
+            }
+
+            nav.hidden {
+                opacity: 0;
+            }
+
+            ul li:hover {
+                transform: scale(1.01);
+                transition: transform 0.2s ease-in-out;
+            }
+        </style>
+</body>
