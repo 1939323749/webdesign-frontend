@@ -14,7 +14,7 @@
 </head>
 
 <body>
-    <header class="flex justify-between items-center bg-pink-600 p-4">
+    <header class="flex justify-between items-center bg-blue-600 p-4 fixed top-0 right-0 left-0">
         <div id="logo" class="logo">
             <el-icon>
                 <CoffeeCup />
@@ -35,7 +35,7 @@
         <nav class="bg-blue-500 text-white p-4 fixed top-16 left-0 bottom-0 w-48 rounded-r-lg">
 
             <div class="bg-sky-300 rounded-lg shadow-lg">
-                <ul class=" hidden md:block list-none m-0 p-0">
+                <ul class=" list-none m-0 p-0">
                     <li class="my-2 "><a href="#"
                             class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:drop-shadow-lg">分类1</a></li>
                     <li class="my-2 "><a href="#"
@@ -47,48 +47,120 @@
                 </ul>
             </div>
         </nav>
-        <main class="mx-60 w-60 h-60">
+        <main id="app" class="bg-gray-200 fixed top-16 bottom-0 left-32 right-0">
+            
+            <div v-for="(group, index) in groupedCovers" :key="`group-${index}`"
+                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
 
-
-            <div class="h-64 flex items-center justify-center">
-                <button class="w-12 h-12 rounded-lg text-lg bg-slate-500" @click="onclick">test</button>
-                <el-empty description="mydx" />
-            </div>
-            <el-skeleton />
-            <br />
-            <div id="app">
-                <div v-if="!loaded">
-                    <el-skeleton :rows="5" animated />
+                <div v-if="!loaded" v-for="cover in group" :key="cover.id" class="w-40 h-20 mr-4 bg-red-200 rounded-lg">
                 </div>
 
-                <div v-else>
-                    <!-- 加载完成后显示的内容 -->
-                    <button class="w-12 h-12 bg-slate-500 rounded-full">66</button>
+                <div v-else v-for="cover in group" :key="`cover-${cover.id}`"
+                    class="w-40 h-20 mr-4 bg-red-200 rounded-lg">
+                    <div class="mx-2 my-2 w-36 h-18 bg-sky-300 rounded-lg">
+                        <img :src="cover.url" alt="视频封面">
+                    </div>
                 </div>
+
             </div>
 
+            <div v-if="index < groupedCovers.length - 1" class="separator">
+                <!-- 在这里添加你的分隔块内容 -->
+            </div>
 
         </main>
 
 
-        <script>
 
-            const app = Vue.createApp({
-                data() {
-                    return {
-                        loaded: false, // 是否加载完成的标志位
-                    };
-                },
-                mounted() {
-                    setTimeout(() => {
-                        this.loaded = true;
-                    }, 2000);
-                },
+
+        <script>
+            const test = Vue.createApp({
                 methods: {
                     onclick() {
                         alert('test');
                     }
                 }
+            })
+            test.mount('#test')
+
+            const app = Vue.createApp({
+                data() {
+                    return {
+                        loaded: false, // 是否加载完成的标志位
+                        covers: [], // 存储视频封面的数据
+                        groupedCovers: [],
+                        rowIndex: 1,
+                    };
+                },
+                watch: {
+                    covers(newCovers) {
+                        this.groupedCovers = this.groupCovers(newCovers);
+                    },
+                },
+                computed: {
+                    shownCovers() {
+                        return this.covers.slice(0, this.rowIndex * 4);
+                    }
+                },
+                methods: {
+                    groupCovers(covers) {
+                        let grouped = {};
+                        covers.forEach((cover) => {
+                            if (!(cover.category in grouped)) {
+                                grouped[cover.category] = [];
+                            }
+                            grouped[cover.category].push(cover);
+                        });
+                        return Object.values(grouped);
+                    },
+                    loadNextRow() {
+                        if (this.rowIndex * 4 < this.covers.length) {
+                            this.rowIndex++;
+                        }
+                    },
+                    onScroll() {
+                        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                        const windowHeight = window.innerHeight;
+                        const documentHeight = document.documentElement.scrollHeight;
+
+                        if (scrollTop + windowHeight >= documentHeight - 10) {
+                            this.loadNextRow();
+                        }
+                    }
+                },
+                mounted() {
+                    setTimeout(() => {
+                        // 在这里获取视频封面的数据，例如从服务器获取
+                        // 假设获取到的数据是这样的：
+
+                        this.covers = [
+                            { id: 1, url: 'cover1.jpg', category: 'A' },
+                            { id: 2, url: 'cover2.jpg', category: 'A' },
+                            { id: 3, url: 'cover3.jpg', category: 'B' },
+                            { id: 4, url: 'cover1.jpg', category: 'A' },
+                            { id: 5, url: 'cover2.jpg', category: 'A' },
+                            { id: 6, url: 'cover3.jpg', category: 'B' },
+                            { id: 7, url: 'cover1.jpg', category: 'A' },
+                            { id: 8, url: 'cover2.jpg', category: 'A' },
+                            { id: 9, url: 'cover3.jpg', category: 'B' },
+                            { id: 10, url: 'cover1.jpg', category: 'A' },
+                            { id: 11, url: 'cover2.jpg', category: 'A' },
+                            { id: 12, url: 'cover3.jpg', category: 'B' },
+                            { id: 13, url: 'cover1.jpg', category: 'A' },
+                            { id: 14, url: 'cover2.jpg', category: 'A' },
+                            { id: 15, url: 'cover3.jpg', category: 'B' },
+                            // ...
+                        ];
+            this.loaded = true;
+            this.groupedCovers = this.groupCovers(this.covers);
+                    }, 2000);
+            window.addEventListener('scroll', this.onScroll);
+                },
+            unmounted() {
+                window.removeEventListener('scroll', this.onScroll);
+            },
+
+
 
 
             })
@@ -99,11 +171,6 @@
         <style>
             @media (min-width: 768px) {
 
-                /* 如果屏幕宽度大于等于 768px，显示导航栏 */
-                nav {
-                    display: block !important;
-                }
-
                 main {
                     margin-left: 56px;
                     /* 导航栏的宽度 */
@@ -112,10 +179,6 @@
 
             @media (max-width: 767px) {
 
-                /* 如果屏幕宽度小于 768px，隐藏导航栏 */
-                nav {
-                    display: none !important;
-                }
 
                 main {
                     margin: 0 auto;
@@ -128,13 +191,6 @@
                 justify-content: center;
             }
 
-            nav {
-                transition: opacity 2s ease-out;
-            }
-
-            nav.hidden {
-                opacity: 0;
-            }
 
             ul li:hover {
                 transform: scale(1.01);
