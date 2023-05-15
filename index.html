@@ -36,23 +36,18 @@
         </div>
     </header>
 
-    <div class="flex">
+    <div class="flex" id="app">
         <nav class="bg-blue-500 text-white p-4 fixed top-16 left-0 bottom-0 w-48 rounded-r-lg">
-
             <div class="bg-sky-300 rounded-lg shadow-lg">
-                <ul class=" list-none m-0 p-0">
-                    <li class="my-2 "><a href="#"
-                            class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:drop-shadow-lg">分类1</a></li>
-                    <li class="my-2 "><a href="#"
-                            class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:shadow-lg">分类2</a></li>
-                    <li class="my-2 "><a href="#"
-                            class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:shadow-lg">分类3</a></li>
-                    <li class="my-2 "><a href="#"
-                            class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:shadow-lg">分类4</a></li>
+                <p class="text-lg text-center">分类</p>
+                <ul class="list-none m-0 p-0">
+                    <li class="my-2" v-for="option in options" :key="option.value">
+                        <a href="#" class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:drop-shadow-lg">{{ option.label }}</a>
+                    </li>
                 </ul>
             </div>
         </nav>
-        <main id="app" class="bg-gray-200 fixed top-16 bottom-0 left-32 right-0 overflow-y-auto"
+        <main  class="bg-gray-200 fixed top-16 bottom-0 left-32 right-0 overflow-y-auto"
             style="overflow-x: hidden;">
             <div class="px-4 py-2">
                 <div v-for="(group, index) in groupedCovers" :key="`group-${index}`">
@@ -67,7 +62,7 @@
                             <div v-if="!loaded">
                                 <el-skeleton :rows="5" animated />
                             </div>
-                            <div v-else class="bg-sky-300">
+                            <div v-else class="bg-sky-300" >
                                 <img :src="cover.url" alt="视频封面" class="cover">
                                 <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
                             </div>
@@ -110,6 +105,7 @@
 
 
         </main>
+    </div>
 
 
 
@@ -211,11 +207,12 @@
                 data() {
                     return {
                         loaded: false, // 是否加载完成的标志位
+                        bvid: '', // 视频的BV号
                         covers: [], // 存储视频封面的数据
                         groupedCovers: [],
                         rowIndex: 1,
                         options: [],    // 分类选择器的选项
-                            
+
                     };
                 },
                 watch: {
@@ -307,8 +304,17 @@
                             .then(data => {
                                 // 处理返回的视频数据
                                 this.covers = data;
-                            }
-                            )
+
+                                // 使用 Set 数据结构去除重复的 category
+                                const categorySet = new Set(data.map(item => item.category));
+
+                                // 将 Set 转换为数组，并映射到 options 数组中
+                                this.options = Array.from(categorySet).map(category => {
+                                    return { value: category, label: category };
+                                });
+                            });
+
+
 
 
                         this.loaded = true;
