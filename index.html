@@ -8,26 +8,30 @@
     <!-- Import component library -->
     <script src="https://unpkg.com/element-plus"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuex@4"></script>
+
 
 
 
 </head>
 
 <body>
-    <header class="flex justify-between items-center bg-blue-600 p-4 fixed top-0 right-0 left-0">
-        <div id="logo" class="logo">
-            <el-icon>
-                <CoffeeCup />
-            </el-icon>
+    <header id="tougao" class="flex justify-between items-center bg-blue-600 p-4 fixed top-0 right-0 left-0">
+        <div id="logo" class="flex items-center">
+            <div class="flex items-center">
+                <img src="https://p1.ssl.qhimg.com/t01cf7f93a00e61e5e9.jpg" class="w-12 h-12 mr-2" alt="Logo">
+            </div>
         </div>
         <div class="flex items-center space-x-4">
             <div class="search">
                 <input type="text" placeholder="搜索..." class="bg-gray-200 px-4 py-2 rounded-l-lg">
                 <button class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600">搜索</button>
             </div>
-            <div class="post">
-                <button class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 shadow-lg">投稿</button>
-            </div>
+            <button @click="$store.commit('toggleShow')"
+                class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 shadow-lg">投稿</button>
+
+
         </div>
     </header>
 
@@ -47,41 +51,128 @@
                 </ul>
             </div>
         </nav>
-        <main id="app" class="bg-gray-200 fixed top-16 bottom-0 left-32 right-0">
-            
-            <div v-for="(group, index) in groupedCovers" :key="`group-${index}`"
-                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
-
-                <div v-if="!loaded" v-for="cover in group" :key="cover.id" class="w-40 h-20 mr-4 bg-red-200 rounded-lg">
-                </div>
-
-                <div v-else v-for="cover in group" :key="`cover-${cover.id}`"
-                    class="w-40 h-20 mr-4 bg-red-200 rounded-lg">
-                    <div class="mx-2 my-2 w-36 h-18 bg-sky-300 rounded-lg">
-                        <img :src="cover.url" alt="视频封面">
+        <main id="app" class="bg-gray-200 fixed top-16 bottom-0 left-32 right-0 overflow-y-auto"
+            style="overflow-x: hidden;">
+            <div class="px-4 py-2">
+                <div v-for="(group, index) in groupedCovers" :key="`group-${index}`">
+                    <div class="separator flex justify-between items-center bg-gray-300 p-2 rounded-lg shadow-lg">
+                        <span class="text-lg">{{ group.category }}</span>
+                        <button @click="loadMore(group.category)"
+                            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">更多</button>
                     </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
+                        <div v-for="cover in group.covers" :key="`cover-${cover.id}`"
+                            class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
+                            <div v-if="!loaded">
+                                <el-skeleton :rows="5" animated />
+                            </div>
+                            <div v-else class="bg-sky-300">
+                                <img :src="cover.url" alt="视频封面" class="cover">
+                                <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
+                            </div>
+                        </div>
+                    </div>
+
+
                 </div>
+            </div>
+            <div v-if="$store.state.submitSuccess" class="alert alert-success">
+                投稿成功!
+            </div>
+
+            <!-- 在这里添加 'fixed', 'top-1/2', 'left-1/2', 'transform', '-translate-x-1/2', '-translate-y-1/2' 这些样式 -->
+            <div v-if="$store.state.show"
+                class="input-box fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-4">
+                <div v-if="$store.state.submitMessage" class="alert alert-success">
+                    {{$store.state.submitMessage}}
+                </div>
+                <input type="text" :value="$store.state.inputText"
+                    @input="$store.commit('updateInputText', $event.target.value)" placeholder="请输入内容"
+                    class="w-full p-2 border rounded-lg">
+                <button v-if="!$store.state.submitMessage" @click="submit"
+                    class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-1/2 shadow-lg">提交</button>
+                <div v-else>{{$store.state.submitMessage}}</div>
+                <button @click="$store.commit('hideInputBox')"
+                    class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 w-1/2 shadow-lg">取消</button>
 
             </div>
 
-            <div v-if="index < groupedCovers.length - 1" class="separator">
-                <!-- 在这里添加你的分隔块内容 -->
-            </div>
+
+
+
 
         </main>
 
 
 
 
+
+
         <script>
-            const test = Vue.createApp({
-                methods: {
-                    onclick() {
-                        alert('test');
+            const store = Vuex.createStore({
+                state() {
+                    return {
+                        show: false,
+                        inputText: '',// 输入框的内容
+                        submitSuccess: false, // 投稿成功状态
+                        submitMessage: null,
+                    };
+                },
+                mutations: {
+                    toggleShow(state) {
+                        state.show = !state.show;
+                    },
+                    hideInputBox(state) {
+                        state.show = false;
+                    },
+                    updateInputText(state, newText) {
+                        state.inputText = newText;
+                    },
+                    clearInputText(state) {
+                        state.inputText = '';
+                    },
+                    submit(state) {
+                        // 处理提交逻辑
+                        console.log('提交内容:', state.inputText);
+                        // 清空输入框
+                        state.inputText = '';
+                        // 关闭输入框
+                        state.show = false;
+                        // 设置投稿成功状态
+                        state.submitSuccess = true;
+                        state.submitMessage = '投稿成功!';
+                        setTimeout(() => {
+                            state.submitMessage = null;
+                        }, 2000);
+                    },
+                    resetSubmitSuccess(state) {
+                        state.submitSuccess = false;
                     }
                 }
-            })
-            test.mount('#test')
+            });
+
+            const tougao = Vue.createApp({
+                data() {
+                    return {
+                        inputText: '' // 输入框的内容
+                    };
+                },
+                methods: {
+                    showInputBox() {
+                        this.$store.commit('toggleShow');
+                    },
+                    hideInputBox() {
+                        this.$store.commit('toggleShow');
+                    },
+                    submit() {
+                        this.$store.commit('submit');
+                    }
+
+                },
+            });
+            tougao.use(store);
+            tougao.mount('#tougao');
+
 
             const app = Vue.createApp({
                 data() {
@@ -103,6 +194,12 @@
                     }
                 },
                 methods: {
+                    showInputBox() {
+                        this.$store.commit('toggleShow');
+                    },
+                    submit() {
+                        this.$store.commit('submit');
+                    },
                     groupCovers(covers) {
                         let grouped = {};
                         covers.forEach((cover) => {
@@ -111,7 +208,13 @@
                             }
                             grouped[cover.category].push(cover);
                         });
-                        return Object.values(grouped);
+
+                        // 将每个分类的封面限制为前 12 个
+                        for (let category in grouped) {
+                            grouped[category] = grouped[category].slice(0, 12);
+                        }
+
+                        return Object.entries(grouped).map(([category, covers]) => ({ category, covers }));
                     },
                     loadNextRow() {
                         if (this.rowIndex * 4 < this.covers.length) {
@@ -126,45 +229,63 @@
                         if (scrollTop + windowHeight >= documentHeight - 10) {
                             this.loadNextRow();
                         }
-                    }
+                    },
+                    loadMore(category) {
+                        // 在这里加载更多的封面，例如向服务器发送请求
+                        // 假设新加载的封面是这样的：
+
+                        let newCovers = [
+                            { id: 16, url: 'cover4.jpg', category: category },
+                            { id: 17, url: 'cover5.jpg', category: category },
+                            // ...
+                        ];
+
+                        // 将新加载的封面添加到对应的分类中
+                        this.covers.push(...newCovers);
+
+                        // 移除封面的限制，并更新 groupedCovers 数据
+                        this.groupedCovers = this.groupedCovers.map(group => {
+                            if (group.category === category) {
+                                // 如果是当前分类，添加新的封面
+                                return { category, covers: [...group.covers, ...newCovers] };
+                            } else {
+                                // 否则，保持封面的限制
+                                return group;
+                            }
+                        });
+                    },
+
                 },
+
                 mounted() {
                     setTimeout(() => {
                         // 在这里获取视频封面的数据，例如从服务器获取
                         // 假设获取到的数据是这样的：
 
-                        this.covers = [
-                            { id: 1, url: 'cover1.jpg', category: 'A' },
-                            { id: 2, url: 'cover2.jpg', category: 'A' },
-                            { id: 3, url: 'cover3.jpg', category: 'B' },
-                            { id: 4, url: 'cover1.jpg', category: 'A' },
-                            { id: 5, url: 'cover2.jpg', category: 'A' },
-                            { id: 6, url: 'cover3.jpg', category: 'B' },
-                            { id: 7, url: 'cover1.jpg', category: 'A' },
-                            { id: 8, url: 'cover2.jpg', category: 'A' },
-                            { id: 9, url: 'cover3.jpg', category: 'B' },
-                            { id: 10, url: 'cover1.jpg', category: 'A' },
-                            { id: 11, url: 'cover2.jpg', category: 'A' },
-                            { id: 12, url: 'cover3.jpg', category: 'B' },
-                            { id: 13, url: 'cover1.jpg', category: 'A' },
-                            { id: 14, url: 'cover2.jpg', category: 'A' },
-                            { id: 15, url: 'cover3.jpg', category: 'B' },
-                            // ...
-                        ];
-            this.loaded = true;
-            this.groupedCovers = this.groupCovers(this.covers);
+                        fetch('http://localhost:8080/api/getvideo')
+                            .then(response => response.json())
+                            .then(data => {
+                                // 处理返回的视频数据
+                                this.covers = data;
+                            }
+                            )
+
+
+                        this.loaded = true;
+                        this.groupedCovers = this.groupCovers(this.covers);
                     }, 2000);
-            window.addEventListener('scroll', this.onScroll);
+                    window.addEventListener('scroll', this.onScroll);
                 },
-            unmounted() {
-                window.removeEventListener('scroll', this.onScroll);
-            },
+                unmounted() {
+                    window.removeEventListener('scroll', this.onScroll);
+                },
 
 
 
 
             })
             app.use(ElementPlus)
+            app.use(store);
             app.mount('#app');
         </script>
 
@@ -195,6 +316,48 @@
             ul li:hover {
                 transform: scale(1.01);
                 transition: transform 0.2s ease-in-out;
+            }
+
+            .separator {
+                width: calc(100% + 1rem);
+                margin-left: -0.5rem;
+                margin-right: -0.5rem;
+                margin-bottom: 0.5rem;
+                /* 增加这一行来控制与下方内容的距离 */
+            }
+
+
+            .cover-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 40px;
+                /* 或你希望的高度 */
+                width: 20px;
+                /* 或你希望的宽度 */
+                overflow: hidden;
+            }
+
+            .cover {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                /* 让图片铺满整个容器 */
+            }
+
+            .bw-mask {
+                filter: grayscale(100%);
+            }
+
+            .cover-description {
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                margin-top: 0.05rem;
+                font-size: 3px;
+                color: #333;
             }
         </style>
 </body>
