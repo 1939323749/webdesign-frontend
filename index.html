@@ -10,10 +10,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuex@4"></script>
-
-
-
-
 </head>
 
 <body>
@@ -30,24 +26,21 @@
             </div>
             <button @click="showInputBox"
                 class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 shadow-lg">投稿</button>
-
-
-
         </div>
     </header>
 
     <div class="flex" id="app">
-        <nav class="bg-blue-500 text-white p-4 fixed top-16 left-0 bottom-0 w-48 rounded-r-lg">
+        <nav class="bg-blue-500 text-white p-4 fixed top-16 left-0 bottom-16 w-48 rounded-r-lg">
             <div class="bg-sky-300 rounded-lg shadow-lg">
                 <p class="text-lg text-center">分类</p>
                 <ul class="list-none m-0 p-0">
                     <li class="my-2" v-for="option in options" :key="option.value">
-                        <a href="#" class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:drop-shadow-lg">{{ option.label }}</a>
+                        <a :href="'category.html?c=' + option.value" target="_blank" class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:drop-shadow-lg">{{ option.label }}</a>
                     </li>
                 </ul>
             </div>
         </nav>
-        <main  class="bg-gray-200 fixed top-16 bottom-0 left-32 right-0 overflow-y-auto"
+        <main  class="bg-gray-200 fixed top-16 bottom-16 left-32 right-0 overflow-y-auto"
             style="overflow-x: hidden;">
             <div class="px-4 py-2">
                 <div v-for="(group, index) in groupedCovers" :key="`group-${index}`">
@@ -70,10 +63,6 @@
                           </div>
                         </div>
                       </div>
-                      
-                      
-
-
                 </div>
             </div>
 
@@ -276,8 +265,7 @@
                         // 假设新加载的封面是这样的：
 
                         let newCovers = [
-                            { id: 16, url: 'cover4.jpg', category: category },
-                            { id: 17, url: 'cover5.jpg', category: category },
+
                             // ...
                         ];
 
@@ -411,3 +399,7 @@
             }
         </style>
 </body>
+
+<footer>
+    <p class="text-lg text-center">test</p>
+</footer>
