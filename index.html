@@ -20,10 +20,10 @@
             </div>
         </div>
         <div class="flex items-center space-x-4">
-            <div class="search">
-                <input type="text" placeholder="搜索..." class="bg-gray-200 px-4 py-2 rounded-l-lg">
-                <button class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600">搜索</button>
-            </div>
+            <form @submit.prevent="search" class="search">
+                <input type="text" v-model="searchTerm" placeholder="搜索..." class="bg-gray-200 px-4 py-2 rounded-l-lg">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600">搜索</button>
+            </form>
             <button @click="showInputBox"
                 class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 shadow-lg">投稿</button>
         </div>
@@ -35,13 +35,14 @@
                 <p class="text-lg text-center">分类</p>
                 <ul class="list-none m-0 p-0">
                     <li class="my-2" v-for="option in options" :key="option.value">
-                        <a :href="'category.html?c=' + option.value" target="_blank" class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:drop-shadow-lg">{{ option.label }}</a>
+                        <a :href="'category.html?c=' + option.value" target="_blank"
+                            class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:drop-shadow-lg">{{ option.label
+                            }}</a>
                     </li>
                 </ul>
             </div>
         </nav>
-        <main  class="bg-gray-200 fixed top-16 bottom-16 left-32 right-0 overflow-y-auto"
-            style="overflow-x: hidden;">
+        <main class="bg-gray-200 fixed top-16 bottom-16 left-32 right-0 overflow-y-auto" style="overflow-x: hidden;">
             <div class="px-4 py-2">
                 <div v-for="(group, index) in groupedCovers" :key="`group-${index}`">
                     <div class="separator flex justify-between items-center bg-gray-300 p-2 rounded-lg shadow-lg">
@@ -50,19 +51,20 @@
                             class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">更多</button>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
-                        <div v-for="cover in group.covers" :key="`cover-${cover.id}`" class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
-                          <a v-if="cover.bvid" :href="'https://www.bilibili.com/video/' + cover.bvid" target="_blank">
-                            <div class="bg-sky-300">
-                              <img :src="cover.url" alt="视频封面" class="cover">
-                              <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
+                        <div v-for="cover in group.covers" :key="`cover-${cover.id}`"
+                            class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
+                            <a v-if="cover.bvid" :href="'https://www.bilibili.com/video/' + cover.bvid" target="_blank">
+                                <div class="bg-sky-300">
+                                    <img :src="cover.url" alt="视频封面" class="cover">
+                                    <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
+                                </div>
+                            </a>
+                            <div v-else class="bg-sky-300">
+                                <img :src="cover.url" alt="视频封面" class="cover">
+                                <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
                             </div>
-                          </a>
-                          <div v-else class="bg-sky-300">
-                            <img :src="cover.url" alt="视频封面" class="cover">
-                            <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
-                          </div>
                         </div>
-                      </div>
+                    </div>
                 </div>
             </div>
 
@@ -105,299 +107,304 @@
 
 
 
-        <script>
-            const store = Vuex.createStore({
-                state() {
-                    return {
-                        show: false,
-                        inputText: '', // 输入框的内容
-                        inputUrl: '', // URL输入框的内容
-                        inputCategory: '', // 分类选择器的值
-                        submitSuccess: false, // 投稿成功状态
-                        submitMessage: null,
-                    };
+    <script>
+        const store = Vuex.createStore({
+            state() {
+                return {
+                    show: false,
+                    inputText: '', // 输入框的内容
+                    inputUrl: '', // URL输入框的内容
+                    inputCategory: '', // 分类选择器的值
+                    submitSuccess: false, // 投稿成功状态
+                    submitMessage: null,
+                    searchTerm: '', // 搜索框的内容
+                };
+            },
+            mutations: {
+                toggleShow(state) {
+                    state.show = !state.show;
                 },
-                mutations: {
-                    toggleShow(state) {
-                        state.show = !state.show;
-                    },
-                    hideInputBox(state) {
-                        state.show = false;
-                    },
-                    updateInputText(state, newText) {
-                        state.inputText = newText;
-                    },
-                    updateInputUrl(state, newUrl) { // 更新URL输入框的内容
-                        state.inputUrl = newUrl;
-                    },
-                    updateInputCategory(state, newCategory) { // 更新分类选择器的值
-                        state.inputCategory = newCategory;
-                    },
-                    clearInputText(state) {
-                        state.inputText = '';
-                    },
-                    submit(state) {
-                        // 设置投稿成功状态和消息
-                        state.submitSuccess = true;
-                        state.submitMessage = '投稿成功!';
-
-                        // 延迟清除提交成功信息和状态
-                        setTimeout(() => {
-                            state.submitSuccess = false;
-                            state.submitMessage = null;
-                            state.show = false;
-                        }, 2000);
-                    },
-
-                    resetSubmitSuccess(state) {
-                        state.submitSuccess = false;
-                    }
+                hideInputBox(state) {
+                    state.show = false;
                 },
-                actions: {
-                    async submitPost({ commit, state }, payload) {
-                        try {
-                            const response = await axios.post('http://localhost:8080/api/post/bili', payload);
-                            if (response.status == 200) {
-                                // 清空输入框和其他输入
-                                state.inputUrl = '';
-                                state.inputCategory = '';
-                                // 设置投稿成功状态，调用 'submit' mutation
-                                commit('submit');
-                            } else {
-                                console.error('Submit failed with status: ', response.status);
-                            }
-                        } catch (error) {
-                            console.error(error);
-                        }
-                    },
-                }
-
-            });
-
-
-            const tougao = Vue.createApp({
-                data() {
-                    return {
-                        inputText: '', // 输入框的内容
-                    };
+                updateInputText(state, newText) {
+                    state.inputText = newText;
                 },
-                methods: {
-                    showInputBox() {
-                        this.$store.commit('toggleShow');
-                    },
-                    hideInputBox() {
-                        this.$store.commit('toggleShow');
-                    },
+                updateInputUrl(state, newUrl) { // 更新URL输入框的内容
+                    state.inputUrl = newUrl;
                 },
-            });
-
-            tougao.use(store);
-            tougao.use(ElementPlus);
-            tougao.mount('#tougao');
-
-
-            const app = Vue.createApp({
-                data() {
-                    return {
-                        loaded: false, // 是否加载完成的标志位
-                        bvid: '', // 视频的BV号
-                        covers: [], // 存储视频封面的数据
-                        groupedCovers: [],
-                        rowIndex: 1,
-                        options: [],    // 分类选择器的选项
-
-                    };
+                updateInputCategory(state, newCategory) { // 更新分类选择器的值
+                    state.inputCategory = newCategory;
                 },
-                watch: {
-                    covers(newCovers) {
-                        this.groupedCovers = this.groupCovers(newCovers);
-                    },
+                clearInputText(state) {
+                    state.inputText = '';
                 },
-                computed: {
-                    shownCovers() {
-                        return this.covers.slice(0, this.rowIndex * 4);
-                    }
-                },
-                methods: {
-                    showInputBox() {
-                        this.$store.commit('toggleShow');
-                    },
-                    submit() {
-                        this.$store.dispatch('submitPost', {
-                            url: this.$store.state.inputUrl,
-                            category: this.$store.state.inputCategory
-                        }).then(() => {
-                            this.$store.commit('resetSubmitSuccess');
-                        })
-                    },
-                    groupCovers(covers) {
-                        let grouped = {};
-                        covers.forEach((cover) => {
-                            if (!(cover.category in grouped)) {
-                                grouped[cover.category] = [];
-                            }
-                            grouped[cover.category].push(cover);
-                        });
+                submit(state) {
+                    // 设置投稿成功状态和消息
+                    state.submitSuccess = true;
+                    state.submitMessage = '投稿成功!';
 
-                        // 将每个分类的封面限制为前 12 个
-                        for (let category in grouped) {
-                            grouped[category] = grouped[category].slice(0, 12);
-                        }
-
-                        return Object.entries(grouped).map(([category, covers]) => ({ category, covers }));
-                    },
-                    loadNextRow() {
-                        if (this.rowIndex * 4 < this.covers.length) {
-                            this.rowIndex++;
-                        }
-                    },
-                    onScroll() {
-                        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                        const windowHeight = window.innerHeight;
-                        const documentHeight = document.documentElement.scrollHeight;
-
-                        if (scrollTop + windowHeight >= documentHeight - 10) {
-                            this.loadNextRow();
-                        }
-                    },
-                    loadMore(category) {
-                        // 在这里加载更多的封面，例如向服务器发送请求
-                        // 假设新加载的封面是这样的：
-
-                        let newCovers = [
-
-                            // ...
-                        ];
-
-                        // 将新加载的封面添加到对应的分类中
-                        this.covers.push(...newCovers);
-
-                        // 移除封面的限制，并更新 groupedCovers 数据
-                        this.groupedCovers = this.groupedCovers.map(group => {
-                            if (group.category === category) {
-                                // 如果是当前分类，添加新的封面
-                                return { category, covers: [...group.covers, ...newCovers] };
-                            } else {
-                                // 否则，保持封面的限制
-                                return group;
-                            }
-                        });
-                    },
-
-                },
-
-                mounted() {
+                    // 延迟清除提交成功信息和状态
                     setTimeout(() => {
-                        // 在这里获取视频封面的数据，例如从服务器获取
-                        // 假设获取到的数据是这样的：
-
-                        fetch('http://localhost:8080/api/getvideo')
-                            .then(response => response.json())
-                            .then(data => {
-                                // 处理返回的视频数据
-                                this.covers = data;
-
-                                // 使用 Set 数据结构去除重复的 category
-                                const categorySet = new Set(data.map(item => item.category));
-
-                                // 将 Set 转换为数组，并映射到 options 数组中
-                                this.options = Array.from(categorySet).map(category => {
-                                    return { value: category, label: category };
-                                });
-                            });
-
-
-
-
-                        this.loaded = true;
-                        this.groupedCovers = this.groupCovers(this.covers);
+                        state.submitSuccess = false;
+                        state.submitMessage = null;
+                        state.show = false;
                     }, 2000);
-                    window.addEventListener('scroll', this.onScroll);
-                },
-                unmounted() {
-                    window.removeEventListener('scroll', this.onScroll);
                 },
 
-
-
-
-            })
-            app.use(ElementPlus)
-            app.use(store);
-            app.mount('#app');
-        </script>
-
-        <style>
-            @media (min-width: 768px) {
-
-                main {
-                    margin-left: 56px;
-                    /* 导航栏的宽度 */
+                resetSubmitSuccess(state) {
+                    state.submitSuccess = false;
                 }
+            },
+            actions: {
+                async submitPost({ commit, state }, payload) {
+                    try {
+                        const response = await axios.post('http://localhost:8080/api/post/bili', payload);
+                        if (response.status == 200) {
+                            // 清空输入框和其他输入
+                            state.inputUrl = '';
+                            state.inputCategory = '';
+                            // 设置投稿成功状态，调用 'submit' mutation
+                            commit('submit');
+                        } else {
+                            console.error('Submit failed with status: ', response.status);
+                        }
+                    } catch (error) {
+                        console.error(error);
+                    }
+                },
             }
 
-            @media (max-width: 767px) {
+        });
 
 
-                main {
-                    margin: 0 auto;
-                    /* 居中 */
+        const tougao = Vue.createApp({
+            data() {
+                return {
+                    inputText: '', // 输入框的内容
+                };
+            },
+            methods: {
+                search: function () {
+                    window.location.href = `search.html?s=${this.searchTerm}`;
+                },
+                showInputBox() {
+                    this.$store.commit('toggleShow');
+                },
+                hideInputBox() {
+                    this.$store.commit('toggleShow');
+                },
+            },
+        });
+
+        tougao.use(store);
+        tougao.use(ElementPlus);
+        tougao.mount('#tougao');
+
+
+        const app = Vue.createApp({
+            data() {
+                return {
+                    loaded: false, // 是否加载完成的标志位
+                    bvid: '', // 视频的BV号
+                    covers: [], // 存储视频封面的数据
+                    groupedCovers: [],
+                    rowIndex: 1,
+                    options: [],    // 分类选择器的选项
+
+                };
+            },
+            watch: {
+                covers(newCovers) {
+                    this.groupedCovers = this.groupCovers(newCovers);
+                },
+            },
+            computed: {
+                shownCovers() {
+                    return this.covers.slice(0, this.rowIndex * 4);
                 }
+            },
+            methods: {
+
+                    showInputBox() {
+                    this.$store.commit('toggleShow');
+                },
+                submit() {
+                    this.$store.dispatch('submitPost', {
+                        url: this.$store.state.inputUrl,
+                        category: this.$store.state.inputCategory
+                    }).then(() => {
+                        this.$store.commit('resetSubmitSuccess');
+                    })
+                },
+                groupCovers(covers) {
+                    let grouped = {};
+                    covers.forEach((cover) => {
+                        if (!(cover.category in grouped)) {
+                            grouped[cover.category] = [];
+                        }
+                        grouped[cover.category].push(cover);
+                    });
+
+                    // 将每个分类的封面限制为前 12 个
+                    for (let category in grouped) {
+                        grouped[category] = grouped[category].slice(0, 12);
+                    }
+
+                    return Object.entries(grouped).map(([category, covers]) => ({ category, covers }));
+                },
+                loadNextRow() {
+                    if (this.rowIndex * 4 < this.covers.length) {
+                        this.rowIndex++;
+                    }
+                },
+                onScroll() {
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    const windowHeight = window.innerHeight;
+                    const documentHeight = document.documentElement.scrollHeight;
+
+                    if (scrollTop + windowHeight >= documentHeight - 10) {
+                        this.loadNextRow();
+                    }
+                },
+                loadMore(category) {
+                    // 在这里加载更多的封面，例如向服务器发送请求
+                    // 假设新加载的封面是这样的：
+
+                    let newCovers = [
+
+                        // ...
+                    ];
+
+                    // 将新加载的封面添加到对应的分类中
+                    this.covers.push(...newCovers);
+
+                    // 移除封面的限制，并更新 groupedCovers 数据
+                    this.groupedCovers = this.groupedCovers.map(group => {
+                        if (group.category === category) {
+                            // 如果是当前分类，添加新的封面
+                            return { category, covers: [...group.covers, ...newCovers] };
+                        } else {
+                            // 否则，保持封面的限制
+                            return group;
+                        }
+                    });
+                },
+
+            },
+
+            mounted() {
+                setTimeout(() => {
+                    // 在这里获取视频封面的数据，例如从服务器获取
+                    // 假设获取到的数据是这样的：
+
+                    fetch('http://localhost:8080/api/getvideo')
+                        .then(response => response.json())
+                        .then(data => {
+                            // 处理返回的视频数据
+                            this.covers = data;
+
+                            // 使用 Set 数据结构去除重复的 category
+                            const categorySet = new Set(data.map(item => item.category));
+
+                            // 将 Set 转换为数组，并映射到 options 数组中
+                            this.options = Array.from(categorySet).map(category => {
+                                return { value: category, label: category };
+                            });
+                        });
+
+
+
+
+                    this.loaded = true;
+                    this.groupedCovers = this.groupCovers(this.covers);
+                }, 2000);
+                window.addEventListener('scroll', this.onScroll);
+            },
+            unmounted() {
+                window.removeEventListener('scroll', this.onScroll);
+            },
+
+
+
+
+        })
+        app.use(ElementPlus)
+        app.use(store);
+        app.mount('#app');
+    </script>
+
+    <style>
+        @media (min-width: 768px) {
+
+            main {
+                margin-left: 56px;
+                /* 导航栏的宽度 */
             }
+        }
 
-            #main.center {
-                display: flex;
-                justify-content: center;
+        @media (max-width: 767px) {
+
+
+            main {
+                margin: 0 auto;
+                /* 居中 */
             }
+        }
+
+        #main.center {
+            display: flex;
+            justify-content: center;
+        }
 
 
-            ul li:hover {
-                transform: scale(1.01);
-                transition: transform 0.2s ease-in-out;
-            }
+        ul li:hover {
+            transform: scale(1.01);
+            transition: transform 0.2s ease-in-out;
+        }
 
-            .separator {
-                width: calc(100% + 1rem);
-                margin-left: -0.5rem;
-                margin-right: -0.5rem;
-                margin-bottom: 0.5rem;
-                /* 增加这一行来控制与下方内容的距离 */
-            }
+        .separator {
+            width: calc(100% + 1rem);
+            margin-left: -0.5rem;
+            margin-right: -0.5rem;
+            margin-bottom: 0.5rem;
+            /* 增加这一行来控制与下方内容的距离 */
+        }
 
 
-            .cover-container {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 40px;
-                /* 或你希望的高度 */
-                width: 20px;
-                /* 或你希望的宽度 */
-                overflow: hidden;
-            }
+        .cover-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 40px;
+            /* 或你希望的高度 */
+            width: 20px;
+            /* 或你希望的宽度 */
+            overflow: hidden;
+        }
 
-            .cover {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                /* 让图片铺满整个容器 */
-            }
+        .cover {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* 让图片铺满整个容器 */
+        }
 
-            .bw-mask {
-                filter: grayscale(100%);
-            }
+        .bw-mask {
+            filter: grayscale(100%);
+        }
 
-            .cover-description {
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-                -webkit-box-orient: vertical;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                margin-top: 0.05rem;
-                font-size: 3px;
-                color: #333;
-            }
-        </style>
+        .cover-description {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 0.05rem;
+            font-size: 3px;
+            color: #333;
+        }
+    </style>
 </body>
 
 <footer>

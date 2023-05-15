@@ -21,10 +21,10 @@
             </div>
         </div>
         <div class="flex items-center space-x-4">
-            <div class="search">
-                <input type="text" placeholder="搜索..." class="bg-gray-200 px-4 py-2 rounded-l-lg">
-                <button class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600">搜索</button>
-            </div>
+            <form @submit.prevent="search" class="search">
+                <input type="text" v-model="searchTerm" placeholder="搜索..." class="bg-gray-200 px-4 py-2 rounded-l-lg">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600">搜索</button>
+            </form>
             <button @click="showInputBox"
                 class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 shadow-lg">投稿</button>
         </div>
@@ -171,6 +171,7 @@
                 groupedCovers: [],
                 rowIndex: 1,
                 options: [],    // 分类选择器的选项
+                searchTerm: '', // 搜索框的内容
             };
         },
         methods: {
@@ -185,13 +186,16 @@
                     this.$store.commit('resetSubmitSuccess');
                 })
             },
+            search: function () {
+                window.location.href = `search.html?s=${this.searchTerm}`;
+            },
         },
         mounted() {
             setTimeout(() => {
                 // 在这里获取视频封面的数据，例如从服务器获取
                 // 假设获取到的数据是这样的：
 
-                fetch('http://localhost:8080/api/getvbys?s='+s)
+                fetch('http://localhost:8080/api/getvbys?s=' + s)
                     .then(response => response.json())
                     .then(data => {
                         // 处理返回的视频数据
@@ -222,7 +226,7 @@
     // 如果参数存在
     if (s) {
         // 使用查询参数来改变页面的内容
-        document.getElementById("logo").innerHTML = "<h1 class=\"text-white text-lg \">"+s+"</h1>"
+        document.getElementById("logo").innerHTML = "<h1 class=\"text-white text-lg \">" + s + "</h1>"
     } else {
         document.getElementById("logo").innerHTML = "No category specified";
     }
