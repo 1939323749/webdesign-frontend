@@ -57,17 +57,21 @@
                             class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">更多</button>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
-                        <div v-for="cover in group.covers" :key="`cover-${cover.id}`"
-                            class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
-                            <div v-if="!loaded">
-                                <el-skeleton :rows="5" animated />
+                        <div v-for="cover in group.covers" :key="`cover-${cover.id}`" class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
+                          <a v-if="cover.bvid" :href="'https://www.bilibili.com/video/' + cover.bvid" target="_blank">
+                            <div class="bg-sky-300">
+                              <img :src="cover.url" alt="视频封面" class="cover">
+                              <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
                             </div>
-                            <div v-else class="bg-sky-300" >
-                                <img :src="cover.url" alt="视频封面" class="cover">
-                                <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
-                            </div>
+                          </a>
+                          <div v-else class="bg-sky-300">
+                            <img :src="cover.url" alt="视频封面" class="cover">
+                            <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
+                          </div>
                         </div>
-                    </div>
+                      </div>
+                      
+                      
 
 
                 </div>
