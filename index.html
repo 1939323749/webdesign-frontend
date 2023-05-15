@@ -82,22 +82,26 @@
             <!-- 在这里添加 'fixed', 'top-1/2', 'left-1/2', 'transform', '-translate-x-1/2', '-translate-y-1/2' 这些样式 -->
             <div v-if="$store.state.show"
                 class="input-box fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-4">
-                <div v-if="$store.state.submitMessage" class="alert alert-success">
-                    {{$store.state.submitMessage}}
+                <div v-if="!$store.state.submitMessage">
+                    <!-- 添加URL输入框 -->
+                    <input type="text" v-model="$store.state.inputUrl" placeholder="请输入URL"
+                        class="w-full p-2 border rounded-lg mb-2">
+                    <!-- 添加分类选择器 -->
+                    <el-select v-model="$store.state.inputCategory" class="m-2" placeholder="Select" size="large">
+                        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+                    </el-select>
+                    <button v-if="!$store.state.submitMessage" @click="submit"
+                        class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-1/2 shadow-lg">提交</button>
+                    <button @click="$store.commit('hideInputBox')"
+                        class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 w-1/2 shadow-lg">取消</button>
                 </div>
-                <!-- 添加URL输入框 -->
-                <input type="text" v-model="$store.state.inputUrl" placeholder="请输入URL"
-                    class="w-full p-2 border rounded-lg mb-2">
-                <!-- 添加分类选择器 -->
-                <el-select v-model="$store.state.inputCategory" class="m-2" placeholder="Select" size="large">
-                    <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
-                <button v-if="!$store.state.submitMessage" @click="submit"
-                    class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-1/2 shadow-lg">提交</button>
 
-                <div v-else>{{$store.state.submitMessage}}</div>
-                <button @click="$store.commit('hideInputBox')"
-                    class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 w-1/2 shadow-lg">取消</button>
+                <!-- 投稿成功信息 -->
+                <div v-else>
+                    <div>{{$store.state.submitMessage}}</div>
+                </div>
+
+
             </div>
 
 
@@ -144,26 +148,15 @@
                         state.inputText = '';
                     },
                     submit(state) {
-                        // 处理提交逻辑
-                        console.log('提交内容:', state.inputText);
-                        console.log('提交URL:', state.inputUrl);
-                        console.log('提交分类:', state.inputCategory);
-
-                        // 清空输入框和其他输入
-                        state.inputText = '';
-                        state.inputUrl = '';
-                        state.inputCategory = '';
-
-                        // 关闭输入框
-                        state.show = false;
-
-                        // 设置投稿成功状态
+                        // 设置投稿成功状态和消息
                         state.submitSuccess = true;
                         state.submitMessage = '投稿成功!';
 
-                        // 延迟清除提交成功信息
+                        // 延迟清除提交成功信息和状态
                         setTimeout(() => {
+                            state.submitSuccess = false;
                             state.submitMessage = null;
+                            state.show = false;
                         }, 2000);
                     },
 
@@ -179,11 +172,7 @@
                                 // 清空输入框和其他输入
                                 state.inputUrl = '';
                                 state.inputCategory = '';
-
-                                // 关闭输入框
-                                state.show = false;
-
-                                // 设置投稿成功状态
+                                // 设置投稿成功状态，调用 'submit' mutation
                                 commit('submit');
                             } else {
                                 console.error('Submit failed with status: ', response.status);
@@ -210,12 +199,6 @@
                     hideInputBox() {
                         this.$store.commit('toggleShow');
                     },
-                    submit() {
-                        this.$store.dispatch('submitPost', {
-                            url: this.$store.state.inputUrl,
-                            category: this.$store.state.inputCategory
-                        });
-                    }
                 },
             });
 
@@ -231,10 +214,8 @@
                         covers: [], // 存储视频封面的数据
                         groupedCovers: [],
                         rowIndex: 1,
-                        options: [    // 分类选择器的选项
-                            { value: 'option1', label: 'Option 1' },
-                            { value: 'option2', label: 'Option 2' },
-                        ],
+                        options: [],    // 分类选择器的选项
+                            
                     };
                 },
                 watch: {
@@ -255,7 +236,9 @@
                         this.$store.dispatch('submitPost', {
                             url: this.$store.state.inputUrl,
                             category: this.$store.state.inputCategory
-                        });
+                        }).then(() => {
+                            this.$store.commit('resetSubmitSuccess');
+                        })
                     },
                     groupCovers(covers) {
                         let grouped = {};
