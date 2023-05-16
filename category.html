@@ -13,143 +13,133 @@
     <title>分类</title>
 </head>
 
-<body  class="p-10">
+<body class="p-10">
     <div id="app">
-    <header class="flex justify-between items-center bg-blue-600 p-4 fixed top-0 right-0 left-0">
-        <div id="logo" class="flex items-center">
-            <div class="flex items-center">
+        <header class="flex justify-between items-center bg-blue-600 p-4 fixed top-0 right-0 left-0">
+            <div id="logo" class="flex items-center">
+                <div class="flex items-center">
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <form @submit.prevent="search" class="search">
+                    <input type="text" v-model="searchTerm" placeholder="搜索..."
+                        class="bg-gray-200 px-4 py-2 rounded-l-lg">
+                    <button type="submit"
+                        class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600">搜索</button>
+                </form>
+                <button @click="toggleShow" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 shadow-lg">投稿</button>
+
+        </header>
+
+        <nav class="bg-blue-500 text-white p-4 fixed top-16 left-0 bottom-0 w-48 rounded-r-lg">
+            <div class="bg-sky-300 rounded-lg shadow-lg">
+                <p class="text-lg text-center">分类</p>
+                <ul class="list-none m-0 p-0">
+                    <li class="my-2" v-for="option in options" :key="option.value">
+                        <a href="#" class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:drop-shadow-lg">{{
+                            option.label }}</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div v-if="show" class="input-box fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-4" style="z-index: 1000">
+
+
+            <div v-if="!submitMessage">
+                <!-- 添加URL输入框 -->
+                <input type="text" v-model="inputUrl" placeholder="请输入URL" class="w-full p-2 border rounded-lg mb-2">
+                <!-- 添加分类选择器 -->
+                <el-select v-model="inputCategory" class="m-2" placeholder="Select" size="large">
+                    <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+                </el-select>
+                <button v-if="!submitMessage" @click="submit"
+                    class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-1/2 shadow-lg">提交</button>
+                <button @click="hideInputBox"
+                    class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 w-1/2 shadow-lg">取消</button>
+            </div>
+
+            <!-- 投稿成功信息 -->
+            <div v-else>
+                <div>{{submitMessage}}</div>
             </div>
         </div>
-        <div class="flex items-center space-x-4">
-            <form @submit.prevent="search" class="search">
-                <input type="text" v-model="searchTerm" placeholder="搜索..." class="bg-gray-200 px-4 py-2 rounded-l-lg">
-                <button type="submit"
-                    class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600">搜索</button>
-            </form>
-            <button @click="showInputBox"
-                class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 shadow-lg">投稿</button>
-        </div>
-    </header>
-
-    <nav class="bg-blue-500 text-white p-4 fixed top-16 left-0 bottom-0 w-48 rounded-r-lg">
-        <div class="bg-sky-300 rounded-lg shadow-lg">
-            <p class="text-lg text-center">分类</p>
-            <ul class="list-none m-0 p-0">
-                <li class="my-2" v-for="option in options" :key="option.value">
-                    <a href="#" class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:drop-shadow-lg">{{
-                        option.label }}</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
 
 
-    <div v-if="$store.state.show"
-        class="input-box fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-4">
-        <div v-if="!$store.state.submitMessage">
-            <!-- 添加URL输入框 -->
-            <input type="text" v-model="$store.state.inputUrl" placeholder="请输入URL"
-                class="w-full p-2 border rounded-lg mb-2">
-            <!-- 添加分类选择器 -->
-            <el-select v-model="$store.state.inputCategory" class="m-2" placeholder="Select" size="large">
-                <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-            </el-select>
-            <button v-if="!$store.state.submitMessage" @click="submit"
-                class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-1/2 shadow-lg">提交</button>
-            <button @click="$store.commit('hideInputBox')"
-                class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 w-1/2 shadow-lg">取消</button>
-        </div>
-
-        <!-- 投稿成功信息 -->
-        <div v-else>
-            <div>{{$store.state.submitMessage}}</div>
-        </div>
+        <div class="px-10 py-20 mt-10 mb-10 ml-10 mr-10">
 
 
-    </div>
-    <div class="px-10 py-20 mt-10 mb-10 ml-10 mr-10">
-
-
-        <div class="bg-gray-200 fixed top-16 bottom-0 left-48 right-0 overflow-y-auto">
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
-                <div v-for="cover in covers" :key="`cover-${cover.id}`"
-                    class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
-                    <a v-if="cover.bvid" :href="'https://www.bilibili.com/video/' + cover.bvid" target="_blank">
-                        <div class="bg-sky-300">
+            <div class="bg-gray-200 fixed top-16 bottom-0 left-48 right-0 overflow-y-auto">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
+                    <div v-for="cover in covers" :key="`cover-${cover.id}`"
+                        class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
+                        <a v-if="cover.bvid" :href="'https://www.bilibili.com/video/' + cover.bvid" target="_blank">
+                            <div class="bg-sky-300">
+                                <img :src="cover.url" alt="视频封面" class="cover">
+                                <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
+                            </div>
+                        </a>
+                        <div v-else class="bg-sky-300">
                             <img :src="cover.url" alt="视频封面" class="cover">
                             <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
                         </div>
-                    </a>
-                    <div v-else class="bg-sky-300">
-                        <img :src="cover.url" alt="视频封面" class="cover">
-                        <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
 
     </div>
 </body>
 <script>
-    const store = Vuex.createStore({
-        state() {
+    const app = Vue.createApp({
+        data() {
             return {
+                inputText: '',
+                loaded: false,
+                bvid: '',
+                covers: [],
+                groupedCovers: [],
+                rowIndex: 1,
+                options: [],
+                searchTerm: '',
                 show: false,
-                inputText: '', // 输入框的内容
-                inputUrl: '', // URL输入框的内容
-                inputCategory: '', // 分类选择器的值
-                submitSuccess: false, // 投稿成功状态
+                inputUrl: '',
+                inputCategory: '',
+                submitSuccess: false,
                 submitMessage: null,
             };
         },
-        mutations: {
-            toggleShow(state) {
-                state.show = !state.show;
+        methods: {
+            search: function () {
+                window.location.href = `search.html?s=${this.searchTerm}`;
             },
-            hideInputBox(state) {
-                state.show = false;
+            toggleShow() {
+                
+                this.show = !this.show;
+                console.log('toggleShow to '+this.show);
             },
-            updateInputText(state, newText) {
-                state.inputText = newText;
+            hideInputBox() {
+                this.show = false;
             },
-            updateInputUrl(state, newUrl) { // 更新URL输入框的内容
-                state.inputUrl = newUrl;
-            },
-            updateInputCategory(state, newCategory) { // 更新分类选择器的值
-                state.inputCategory = newCategory;
-            },
-            clearInputText(state) {
-                state.inputText = '';
-            },
-            submit(state) {
-                // 设置投稿成功状态和消息
-                state.submitSuccess = true;
-                state.submitMessage = '投稿成功!';
-
-                // 延迟清除提交成功信息和状态
-                setTimeout(() => {
-                    state.submitSuccess = false;
-                    state.submitMessage = null;
-                    state.show = false;
-                }, 2000);
-            },
-
-            resetSubmitSuccess(state) {
-                state.submitSuccess = false;
-            }
-        },
-        actions: {
-            async submitPost({ commit, state }, payload) {
+            async submit() {
                 try {
-                    const response = await axios.post('http://localhost:8080/api/post/bili', payload);
+                    const response = await axios.post('http://localhost:8080/api/post/bili', {
+                        url: this.inputUrl,
+                        category: this.inputCategory
+                    });
                     if (response.status == 200) {
-                        // 清空输入框和其他输入
-                        state.inputUrl = '';
-                        state.inputCategory = '';
-                        // 设置投稿成功状态，调用 'submit' mutation
-                        commit('submit');
+                        this.inputUrl = '';
+                        this.inputCategory = '';
+
+                        this.submitSuccess = true;
+                        this.submitMessage = '投稿成功!';
+
+                        setTimeout(() => {
+                            this.submitSuccess = false;
+                            this.submitMessage = null;
+                            this.show = false;
+                        }, 2000);
                     } else {
                         console.error('Submit failed with status: ', response.status);
                     }
@@ -157,56 +147,16 @@
                     console.error(error);
                 }
             },
-        }
-
-    });
-
-
-    const app = Vue.createApp({
-        data() {
-            return {
-                inputText: '', // 输入框的内容
-                loaded: false, // 是否加载完成的标志位
-                bvid: '', // 视频的BV号
-                covers: [], // 存储视频封面的数据
-                groupedCovers: [],
-                rowIndex: 1,
-                options: [],    // 分类选择器的选项
-                searchTerm: '', // 搜索框的内容
-            };
-        },
-        methods: {
-            search: function () {
-                window.location.href = `search.html?s=${this.searchTerm}`;
-            },
-            showInputBox() {
-                this.$store.commit('toggleShow');
-            },
-
-            submit() {
-                this.$store.dispatch('submitPost', {
-                    url: this.$store.state.inputUrl,
-                    category: this.$store.state.inputCategory
-                }).then(() => {
-                    this.$store.commit('resetSubmitSuccess');
-                })
-            },
         },
         mounted() {
             setTimeout(() => {
-                // 在这里获取视频封面的数据，例如从服务器获取
-                // 假设获取到的数据是这样的：
-
                 fetch('http://localhost:8080/api/getvbyc?c=' + c)
                     .then(response => response.json())
                     .then(data => {
-                        // 处理返回的视频数据
                         this.covers = data;
 
-                        // 使用 Set 数据结构去除重复的 category
                         const categorySet = new Set(data.map(item => item.category));
 
-                        // 将 Set 转换为数组，并映射到 options 数组中
                         this.options = Array.from(categorySet).map(category => {
                             return { value: category, label: category };
                         });
@@ -216,9 +166,9 @@
         },
     });
 
-    app.use(store);
     app.use(ElementPlus);
     app.mount('#app');
+
     // 获取当前URL
     var url = new URL(window.location.href);
 
