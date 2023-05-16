@@ -3,6 +3,7 @@
 <head>
     <!-- Import style -->
     <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/theme-chalk/display.css">
     <!-- Import Vue 3 -->
     <script src="https://unpkg.com/vue@3"></script>
     <!-- Import component library -->
@@ -15,78 +16,127 @@
 
 <body class="p-10">
     <div id="app">
-        <header class="flex justify-between items-center bg-blue-600 p-4 fixed top-0 right-0 left-0">
-            <div id="logo" class="flex items-center">
-                <div class="flex items-center">
-                </div>
-            </div>
-            <div class="flex items-center space-x-4">
-                <form @submit.prevent="search" class="search">
-                    <input type="text" v-model="searchTerm" placeholder="搜索..."
-                        class="bg-gray-200 px-4 py-2 rounded-l-lg">
-                    <button type="submit"
-                        class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600">搜索</button>
-                </form>
-                <button @click="toggleShow" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 shadow-lg">投稿</button>
-
-        </header>
-
-        <nav class="bg-blue-500 text-white p-4 fixed top-16 left-0 bottom-0 w-48 rounded-r-lg">
-            <div class="bg-sky-300 rounded-lg shadow-lg">
-                <p class="text-lg text-center">分类</p>
-                <ul class="list-none m-0 p-0">
-                    <li class="my-2" v-for="option in options" :key="option.value">
-                        <a href="#" class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:drop-shadow-lg">{{
-                            option.label }}</a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-
-        <div v-if="show" class="input-box fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-4" style="z-index: 1000">
-
-
-            <div v-if="!submitMessage">
-                <!-- 添加URL输入框 -->
-                <input type="text" v-model="inputUrl" placeholder="请输入URL" class="w-full p-2 border rounded-lg mb-2">
-                <!-- 添加分类选择器 -->
-                <el-select v-model="inputCategory" class="m-2" placeholder="Select" size="large">
-                    <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
-                <button v-if="!submitMessage" @click="submit"
-                    class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-1/2 shadow-lg">提交</button>
-                <button @click="hideInputBox"
-                    class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 w-1/2 shadow-lg">取消</button>
-            </div>
-
-            <!-- 投稿成功信息 -->
-            <div v-else>
-                <div>{{submitMessage}}</div>
-            </div>
-        </div>
-
-
-        <div class="px-10 py-20 mt-10 mb-10 ml-10 mr-10">
-
-
-            <div class="bg-gray-200 fixed top-16 bottom-0 left-48 right-0 overflow-y-auto">
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
-                    <div v-for="cover in covers" :key="`cover-${cover.id}`"
-                        class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
-                        <a v-if="cover.bvid" :href="'https://www.bilibili.com/video/' + cover.bvid" target="_blank">
-                            <div class="bg-sky-300">
-                                <img :src="cover.url" alt="视频封面" class="cover">
-                                <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
-                            </div>
-                        </a>
-                        <div v-else class="bg-sky-300">
-                            <img :src="cover.url" alt="视频封面" class="cover">
-                            <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
+        <el-container>
+            <el-header>
+                <header class="flex justify-between items-center bg-blue-600 p-4 fixed top-0 right-0 left-0">
+                    <div id="logo" class="flex items-center">
+                        <div class="flex items-center">
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
+                    <div class="flex items-center space-x-4">
+                        <form @submit.prevent="search" class="search">
+                            <input type="text" v-model="searchTerm" placeholder="搜索..."
+                                class="bg-gray-200 px-4 py-2 rounded-l-lg">
+                            <button type="submit"
+                                class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600">搜索</button>
+                        </form>
+                        <button @click="toggleShow"
+                            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 shadow-lg">投稿</button>
+
+                </header>
+            </el-header>
+            <el-container>
+                <el-aside>
+                    <nav class="bg-blue-500 text-white p-4 fixed top-16 left-0 bottom-0 w-48 rounded-r-lg">
+                        <div class="bg-sky-300 rounded-lg shadow-lg">
+                            <p class="text-lg text-center">分类</p>
+                            <ul class="list-none m-0 p-0">
+                                <li class="my-2" v-for="option in options" :key="option.value">
+                                    <a href="#"
+                                        class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:drop-shadow-lg">{{
+                                        option.label }}</a>
+                                </li>
+                            </ul>
+                        </div>
+
+
+
+                    </nav>
+
+                </el-aside>
+
+
+            </el-container>
+            <el-container>
+                <el-main>
+                    <el-container v-if="show"
+                        class="input-box fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-4"
+                        style="z-index: 1000">
+
+
+                        <div v-if="!submitMessage">
+                            <!-- 添加URL输入框 -->
+                            <input type="text" v-model="inputUrl" placeholder="请输入URL"
+                                class="w-full p-2 border rounded-lg mb-2">
+                            <!-- 添加分类选择器 -->
+                            <el-select v-model="inputCategory" class="m-2" placeholder="Select" size="large">
+                                <el-option v-for="item in options" :key="item.value" :label="item.label"
+                                    :value="item.value" />
+                            </el-select>
+                            <button v-if="!submitMessage" @click="submit"
+                                class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-1/2 shadow-lg">提交</button>
+                            <button @click="dialogVisible = true"
+                                class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 w-1/2 shadow-lg">取消</button>
+                        </div>
+
+                        <!-- 投稿成功信息 -->
+                        <div v-else>
+                            <div>{{submitMessage}}</div>
+                        </div>
+
+
+                        
+                    </el-container>
+                    <div>
+                        <el-dialog v-model="dialogVisible" title="Tips" width="30%" draggable>
+                            <span>确定取消吗</span>
+                            <template #footer>
+                                <span class="dialog-footer">
+                                    <el-button @click="dialogVisible = false">Cancel</el-button>
+                                    <el-button type="primary"
+                                        @click="handleConfirm"
+                                        class="text-black">
+                                        确定
+                                    </el-button>
+                                </span>
+                            </template>
+                        </el-dialog>
+                    </div>
+
+                    <div class="px-10 py-20 mt-10 mb-10 ml-10 mr-10">
+
+
+                        <div class="bg-gray-200 fixed top-16 bottom-0 left-48 right-0 overflow-y-auto">
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
+                                <div v-for="cover in covers" :key="`cover-${cover.id}`"
+                                    class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
+                                    <a v-if="cover.bvid" :href="'https://www.bilibili.com/video/' + cover.bvid"
+                                        target="_blank">
+                                        <div class="bg-sky-300">
+                                            <img :src="cover.url" alt="视频封面" class="cover">
+                                            <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
+                                        </div>
+                                    </a>
+                                    <div v-else class="bg-sky-300">
+                                        <img :src="cover.url" alt="视频封面" class="cover">
+                                        <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </el-main>
+                <el-footer>Footer</el-footer>
+            </el-container>
+
+        </el-container>
+
+
+
+
+
 
 
     </div>
@@ -108,19 +158,31 @@
                 inputCategory: '',
                 submitSuccess: false,
                 submitMessage: null,
+                dialogVisible: false
             };
         },
         methods: {
             search: function () {
                 window.location.href = `search.html?s=${this.searchTerm}`;
             },
+            openDialog() {
+                console.log('openDialog');
+                this.dialogVisible = true
+            },
+            closeDialog() {
+                this.dialogVisible = false
+            },
             toggleShow() {
-                
+
                 this.show = !this.show;
-                console.log('toggleShow to '+this.show);
+                console.log('toggleShow to ' + this.show);
             },
             hideInputBox() {
                 this.show = false;
+            },
+            handleConfirm() {
+                this.dialogVisible = false;
+                this.hideInputBox();
             },
             async submit() {
                 try {
@@ -204,7 +266,8 @@
         text-overflow: ellipsis;
         margin-top: 0.05rem;
         font-size: 3px;
-        color: #333;
+        color:
+            #333;
     }
 </style>
 
