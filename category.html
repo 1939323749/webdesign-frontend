@@ -37,7 +37,7 @@
             </el-header>
             <el-container class="bg-slate-100 fixed bottom-0 top-16 right-0 left-0" fill="fill">
                 <el-container>
-                    <el-aside class="bg-blue-500 text-white p-4 fixed top-16 left-0 bottom-0 w-48 rounded-r-lg">
+                    <el-aside class="bg-blue-500 text-white p-4 fixed top-16 left-0 bottom-16 w-48 rounded-r-lg">
                         <nav>
                             <div class="bg-sky-300 rounded-lg shadow-lg">
                                 <p class="text-lg text-center">分类</p>
@@ -53,7 +53,7 @@
                     </el-aside>
                 </el-container>
                 <el-container>
-                    <el-main class="">
+                    <el-main>
                         <el-container v-if="show"
                             class="input-box fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-4"
                             style="z-index: 1000">
@@ -73,10 +73,18 @@
                                         </el-select>
                                     </div>
                                     <div>
-                                        <button v-if="!submitMessage" @click="submit"
-                                            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-1/2 shadow-lg">提交</button>
-                                        <button @click="dialogVisible = true"
-                                            class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 w-1/2 shadow-lg">取消</button>
+                                        <el-row gutter="20">
+                                            <el-col span="20">
+                                                <button v-if="!submitMessage" @click="submit"
+                                                    class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 shadow-lg">提交</button>
+                                            </el-col>
+                                            <el-col span="20">
+
+                                                <button @click="dialogVisible = true"
+                                                    class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 shadow-lg">取消</button>
+                                            </el-col>
+                                        </el-row>
+
                                     </div>
                                 </el-space>
 
@@ -86,9 +94,13 @@
 
                             <!-- 投稿成功信息 -->
                             <div v-else>
-                                <div>{{submitMessage}}</div>
+                                <div v-if="submitSuccess">
+                                    <el-result icon="success" :title="submitMessage"></el-result>
+                                </div>
+                                <div v-else>
+                                    <el-result icon="error" :title="submitMessage"></el-result>
+                                </div>
                             </div>
-
 
 
                         </el-container>
@@ -110,56 +122,57 @@
 
 
                         <el-space class="ml-48">
-                            <div>
+                            <div v-if="!loaded">
+                                <el-skeleton />
+                                <br />
+                                <el-skeleton style="--el-skeleton-circle-size: 100px">
+                                    <template #template>
+                                        <el-skeleton-item variant="circle" />
+                                    </template>
+                                </el-skeleton>
+                            </div>
 
-                                <div v-if="!loaded">
-                                    <el-skeleton />
-                                    <br />
-                                    <el-skeleton style="--el-skeleton-circle-size: 100px">
-                                        <template #template>
-                                            <el-skeleton-item variant="circle" />
-                                        </template>
-                                    </el-skeleton>
-                                </div>
-
-                                <div v-else>
-                                    <div v-if="covers">
-                                        <el-space fill="fill">
-                                            <div
-                                                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
-                                                <div v-for="cover in covers" :key="`cover-${cover.id}`"
-                                                    class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
-                                                    <a v-if="cover.bvid"
-                                                        :href="'https://www.bilibili.com/video/' + cover.bvid"
-                                                        target="_blank">
-                                                        <div class="bg-sky-300">
-                                                            <img :src="cover.url" alt="视频封面" class="cover">
-                                                            <p class="cover-description">{{ cover.description }}</p>
-                                                            <!-- 视频简介 -->
-                                                        </div>
-                                                    </a>
-                                                    <div v-else class="bg-sky-300">
+                            <div v-else>
+                                <div v-if="covers">
+                                    <el-space fill="fill">
+                                        <div
+                                            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
+                                            <div v-for="cover in covers" :key="`cover-${cover.id}`"
+                                                class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
+                                                <a v-if="cover.bvid"
+                                                    :href="'https://www.bilibili.com/video/' + cover.bvid"
+                                                    target="_blank">
+                                                    <div class="bg-sky-300">
                                                         <img :src="cover.url" alt="视频封面" class="cover">
                                                         <p class="cover-description">{{ cover.description }}</p>
                                                         <!-- 视频简介 -->
                                                     </div>
+                                                </a>
+                                                <div v-else class="bg-sky-300">
+                                                    <img :src="cover.url" alt="视频封面" class="cover">
+                                                    <p class="cover-description">{{ cover.description }}</p>
+                                                    <!-- 视频简介 -->
                                                 </div>
-
                                             </div>
-                                        </el-space>
-                                    </div>
-                                    <div v-else>
-                                        <el-empty />
-                                    </div>
 
+                                        </div>
+                                    </el-space>
                                 </div>
+                                <div v-else>
+                                    <el-empty />
+                                </div>
+
                             </div>
 
 
                         </el-space>
 
                     </el-main>
-                    <el-footer>Footer</el-footer>
+                    <el-footer>
+                        <div>
+                            <p class="text-center">footer</p>
+                        </div>
+                    </el-footer>
 
                 </el-container>
 
@@ -221,6 +234,15 @@
                 this.hideInputBox();
             },
             async submit() {
+                if (!this.inputUrl || !this.inputCategory) {
+                    this.submitSuccess = false;
+                    this.submitMessage = 'URL和分类不能为空!';
+                    setTimeout(() => {
+                        this.submitSuccess = false;
+                        this.submitMessage = null;
+                    }, 2000);
+                    return;
+                }
                 try {
                     const response = await axios.post('http://localhost:8080/api/post/bili', {
                         url: this.inputUrl,
