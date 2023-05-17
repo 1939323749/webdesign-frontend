@@ -18,7 +18,7 @@
     <div id="app">
         <el-container>
             <el-header>
-                <header class="flex justify-between items-center bg-blue-600 p-4 fixed top-0 right-0 left-0">
+                <header class="h-16 flex justify-between items-center bg-blue-600 p-4 fixed top-0 right-0 left-0">
                     <div id="logo" class="flex items-center">
                         <div class="flex items-center">
                         </div>
@@ -35,102 +35,136 @@
 
                 </header>
             </el-header>
-            <el-container>
-                <el-aside>
-                    <nav class="bg-blue-500 text-white p-4 fixed top-16 left-0 bottom-0 w-48 rounded-r-lg">
-                        <div class="bg-sky-300 rounded-lg shadow-lg">
-                            <p class="text-lg text-center">分类</p>
-                            <ul class="list-none m-0 p-0">
-                                <li class="my-2" v-for="option in options" :key="option.value">
-                                    <a href="#"
-                                        class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:drop-shadow-lg">{{
-                                        option.label }}</a>
-                                </li>
-                            </ul>
-                        </div>
-
-
-
-                    </nav>
-
-                </el-aside>
-
-
-            </el-container>
-            <el-container>
-                <el-main>
-                    <el-container v-if="show"
-                        class="input-box fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-4"
-                        style="z-index: 1000">
-
-
-                        <div v-if="!submitMessage">
-                            <!-- 添加URL输入框 -->
-                            <input type="text" v-model="inputUrl" placeholder="请输入URL"
-                                class="w-full p-2 border rounded-lg mb-2">
-                            <!-- 添加分类选择器 -->
-                            <el-select v-model="inputCategory" class="m-2" placeholder="Select" size="large">
-                                <el-option v-for="item in options" :key="item.value" :label="item.label"
-                                    :value="item.value" />
-                            </el-select>
-                            <button v-if="!submitMessage" @click="submit"
-                                class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-1/2 shadow-lg">提交</button>
-                            <button @click="dialogVisible = true"
-                                class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 w-1/2 shadow-lg">取消</button>
-                        </div>
-
-                        <!-- 投稿成功信息 -->
-                        <div v-else>
-                            <div>{{submitMessage}}</div>
-                        </div>
-
-
-                        
-                    </el-container>
-                    <div>
-                        <el-dialog v-model="dialogVisible" title="Tips" width="30%" draggable>
-                            <span>确定取消吗</span>
-                            <template #footer>
-                                <span class="dialog-footer">
-                                    <el-button @click="dialogVisible = false">Cancel</el-button>
-                                    <el-button type="primary"
-                                        @click="handleConfirm"
-                                        class="text-black">
-                                        确定
-                                    </el-button>
-                                </span>
-                            </template>
-                        </el-dialog>
-                    </div>
-
-                    <div class="px-10 py-20 mt-10 mb-10 ml-10 mr-10">
-
-
-                        <div class="bg-gray-200 fixed top-16 bottom-0 left-48 right-0 overflow-y-auto">
-                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
-                                <div v-for="cover in covers" :key="`cover-${cover.id}`"
-                                    class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
-                                    <a v-if="cover.bvid" :href="'https://www.bilibili.com/video/' + cover.bvid"
-                                        target="_blank">
-                                        <div class="bg-sky-300">
-                                            <img :src="cover.url" alt="视频封面" class="cover">
-                                            <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
-                                        </div>
-                                    </a>
-                                    <div v-else class="bg-sky-300">
-                                        <img :src="cover.url" alt="视频封面" class="cover">
-                                        <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
+            <el-container class="bg-slate-100 fixed bottom-0 top-16 right-0 left-0" fill="fill">
+                <el-container>
+                    <el-aside class="bg-blue-500 text-white p-4 fixed top-16 left-0 bottom-0 w-48 rounded-r-lg">
+                        <nav>
+                            <div class="bg-sky-300 rounded-lg shadow-lg">
+                                <p class="text-lg text-center">分类</p>
+                                <ul class="list-none m-0 p-0">
+                                    <li class="my-2" v-for="option in options" :key="option.value">
+                                        <a href="#"
+                                            class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:drop-shadow-lg">{{
+                                            option.label }}</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </nav>
+                    </el-aside>
+                </el-container>
+                <el-container>
+                    <el-main class="">
+                        <el-container v-if="show"
+                            class="input-box fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-4"
+                            style="z-index: 1000">
+                            <div v-if="!submitMessage">
+                                <!-- 添加URL输入框 -->
+                                <el-space direction="vertical">
+                                    <div>
+                                        <input type="text" v-model="inputUrl" placeholder="请输入URL"
+                                            class="w-full p-2 border rounded-lg mb-2">
                                     </div>
-                                </div>
+                                    <div>
+                                        <!-- 添加分类选择器 -->
+                                        <el-select v-model="inputCategory" class="m-2" placeholder="Select"
+                                            size="large">
+                                            <el-option v-for="item in options" :key="item.value" :label="item.label"
+                                                :value="item.value" />
+                                        </el-select>
+                                    </div>
+                                    <div>
+                                        <button v-if="!submitMessage" @click="submit"
+                                            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-1/2 shadow-lg">提交</button>
+                                        <button @click="dialogVisible = true"
+                                            class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 w-1/2 shadow-lg">取消</button>
+                                    </div>
+                                </el-space>
+
 
 
                             </div>
-                        </div>
-                    </div>
-                </el-main>
-                <el-footer>Footer</el-footer>
-            </el-container>
 
+                            <!-- 投稿成功信息 -->
+                            <div v-else>
+                                <div>{{submitMessage}}</div>
+                            </div>
+
+
+
+                        </el-container>
+                        <div>
+                            <el-dialog v-model="dialogVisible" title="Tips" width="30%" draggable>
+                                <span>确定取消吗</span>
+                                <template #footer>
+                                    <span class="dialog-footer">
+                                        <el-button @click="dialogVisible = false">Cancel</el-button>
+                                        <el-button type="primary" @click="handleConfirm" class="text-black">
+                                            确定
+                                        </el-button>
+                                    </span>
+                                </template>
+                            </el-dialog>
+                        </div>
+
+
+
+
+                        <el-space class="ml-48">
+                            <div>
+
+                                <div v-if="!loaded">
+                                    <el-skeleton />
+                                    <br />
+                                    <el-skeleton style="--el-skeleton-circle-size: 100px">
+                                        <template #template>
+                                            <el-skeleton-item variant="circle" />
+                                        </template>
+                                    </el-skeleton>
+                                </div>
+
+                                <div v-else>
+                                    <div v-if="covers">
+                                        <el-space fill="fill">
+                                            <div
+                                                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
+                                                <div v-for="cover in covers" :key="`cover-${cover.id}`"
+                                                    class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
+                                                    <a v-if="cover.bvid"
+                                                        :href="'https://www.bilibili.com/video/' + cover.bvid"
+                                                        target="_blank">
+                                                        <div class="bg-sky-300">
+                                                            <img :src="cover.url" alt="视频封面" class="cover">
+                                                            <p class="cover-description">{{ cover.description }}</p>
+                                                            <!-- 视频简介 -->
+                                                        </div>
+                                                    </a>
+                                                    <div v-else class="bg-sky-300">
+                                                        <img :src="cover.url" alt="视频封面" class="cover">
+                                                        <p class="cover-description">{{ cover.description }}</p>
+                                                        <!-- 视频简介 -->
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </el-space>
+                                    </div>
+                                    <div v-else>
+                                        <el-empty />
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </el-space>
+
+                    </el-main>
+                    <el-footer>Footer</el-footer>
+
+                </el-container>
+
+
+            </el-container>
         </el-container>
 
 
@@ -142,6 +176,8 @@
     </div>
 </body>
 <script>
+    const ElLoading = ElementPlus.ElLoading;
+
     const app = Vue.createApp({
         data() {
             return {
@@ -211,6 +247,11 @@
             },
         },
         mounted() {
+            const loading = ElLoading.service({
+                lock: true,
+                text: 'Loading',
+                background: 'rgba(0, 0, 0, 0.7)',
+            });
             setTimeout(() => {
                 fetch('http://localhost:8080/api/getvbyc?c=' + c)
                     .then(response => response.json())
@@ -224,6 +265,7 @@
                         });
                     });
                 this.loaded = true;
+                loading.close();
             }, 2000);
         },
     });
