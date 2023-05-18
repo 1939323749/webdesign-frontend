@@ -9,8 +9,7 @@
     <!-- Import component library -->
     <script src="https://unpkg.com/element-plus"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <title>分类</title>
+    <title>关于</title>
 </head>
 
 <body class="p-10">
@@ -35,22 +34,6 @@
                 </header>
             </el-header>
             <el-container class="bg-slate-100 fixed bottom-0 top-16 right-0 left-0" fill="fill">
-                <el-container>
-                    <el-aside class="bg-blue-500 text-white p-4 fixed top-16 left-0 bottom-16 w-48 rounded-r-lg">
-                        <nav>
-                            <div class="bg-sky-300 rounded-lg shadow-lg">
-                                <p class="text-lg text-center">分类</p>
-                                <ul class="list-none m-0 p-0">
-                                    <li class="my-2" v-for="option in options" :key="option.value">
-                                        <a href="#"
-                                            class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:drop-shadow-lg">{{
-                                            option.label }}</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </nav>
-                    </el-aside>
-                </el-container>
                 <el-container>
                     <el-main>
                         <el-container v-if="show"
@@ -120,57 +103,12 @@
 
 
 
-                        <el-space class="ml-48">
-                            <div v-if="!loaded">
-                                <el-skeleton />
-                                <br />
-                                <el-skeleton style="--el-skeleton-circle-size: 100px">
-                                    <template #template>
-                                        <el-skeleton-item variant="circle" />
-                                    </template>
-                                </el-skeleton>
-                            </div>
-
-                            <div v-else>
-                                <div v-if="covers">
-                                    <el-space fill="fill">
-                                        <div
-                                            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
-                                            <div v-for="cover in covers" :key="`cover-${cover.id}`"
-                                                class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
-                                                <a v-if="cover.bvid"
-                                                    :href="'https://www.bilibili.com/video/' + cover.bvid"
-                                                    target="_blank">
-                                                    <div class="bg-sky-300">
-                                                        <img :src="cover.url" alt="视频封面" class="cover" :hover="">
-                                                        <p class="cover-description">{{ cover.description }}</p>
-                                                        <!-- 视频简介 -->
-                                                    </div>
-                                                </a>
-                                                <div v-else class="bg-sky-300">
-                                                    <img :src="cover.url" alt="视频封面" class="cover">
-                                                    <p class="cover-description">{{ cover.description }}</p>
-                                                    <!-- 视频简介 -->
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </el-space>
-                                </div>
-                                <div v-else>
-                                    <el-empty />
-                                </div>
-
-                            </div>
-
-
-                        </el-space>
 
                     </el-main>
                     <el-footer class="bg-blue-600 h-16 fixed bottom-0 left-0 right-0">
                         <el-text class="mx-1" type="primary">Made with <3</el-text>
                     </br>
-                        <el-link href="about.html" target="_blank" class="mx-1" type="primary">About</el-link>
+                        <el-link href="https://element-plus.org" target="_blank" class="mx-1" type="primary">About</el-link>
                     </el-footer>
 
                 </el-container>
@@ -193,11 +131,6 @@
         data() {
             return {
                 inputText: '',
-                loaded: false,
-                bvid: '',
-                covers: [],
-                groupedCovers: [],
-                rowIndex: 1,
                 options: [],
                 searchTerm: '',
                 show: false,
@@ -271,71 +204,14 @@
             },
         },
         mounted() {
-            const loading = ElLoading.service({
-                lock: true,
-                text: 'Loading',
-                background: 'rgba(0, 0, 0, 0.7)',
-            });
-            setTimeout(() => {
-                fetch('http://localhost:8080/api/getvbyc?c=' + c)
-                    .then(response => response.json())
-                    .then(data => {
-                        this.covers = data;
-                        console.log(data);
-
-                        const categorySet = new Set(data.map(item => item.category));
-
-                        this.options = Array.from(categorySet).map(category => {
-                            return { value: category, label: category };
-                        });
-                    });
-                this.loaded = true;
-                loading.close();
-            }, 2000);
         },
     });
 
     app.use(ElementPlus);
     app.mount('#app');
-
-    // 获取当前URL
-    var url = new URL(window.location.href);
-
-    // 获取查询参数
-    var c = url.searchParams.get("c");
-
-    // 如果参数存在
-    if (c) {
-        // 使用查询参数来改变页面的内容
-        document.getElementById("logo").innerHTML = "<h1 class=\"text-white text-lg \">" + c + "</h1>"
-    } else {
-        document.getElementById("logo").innerHTML = "No category specified";
-    }
 </script>
 
 <style>
-    .cover {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        /* 让图片铺满整个容器 */
-    }
-
-    .bw-mask {
-        filter: grayscale(100%);
-    }
-
-    .cover-description {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        margin-top: 0.05rem;
-        font-size: 3px;
-        color:
-            #333;
-    }
     
 </style>
 
