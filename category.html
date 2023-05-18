@@ -138,20 +138,39 @@
                                             class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
                                             <div v-for="cover in covers" :key="`cover-${cover.id}`"
                                                 class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
-                                                <a v-if="cover.bvid"
-                                                    :href="'https://www.bilibili.com/video/' + cover.bvid"
+                                                <a :href="'https://www.bilibili.com/video/' + cover.bvid"
                                                     target="_blank">
                                                     <div class="bg-sky-300">
-                                                        <img :src="cover.url" alt="视频封面" class="cover" :hover="">
-                                                        <p class="cover-description">{{ cover.description }}</p>
-                                                        <!-- 视频简介 -->
+                                                        <img :src="cover.url" alt="视频封面" class="cover">
+                                                        <el-popover placement="bottom-start" title="Title" :width="200"
+                                                            trigger="hover"
+                                                            content="this is content, this is content, this is content">
+                                                            <template #reference>
+                                                                <p class="cover-description">{{ cover.description }}</p>
+                                                            </template>
+                                                            <el-space direction="vertical">
+                                                                <el-tag v-if="cover.id==16" class="ml-2" 
+                                                                    type="success">好评如潮:{{ cover.vote
+                                                                    }}/{{cover.id}}</el-tag>
+                                                                <el-tag v-else-if="cover.id==17" class="ml-2"
+                                                                    type="info">褒贬不一:{{ cover.vote
+                                                                    }}/{{cover.id}}</el-tag>
+                                                                <el-tag v-else-if="cover.id==18" class="ml-2"
+                                                                    type="warning">多半差评:{{ cover.vote
+                                                                    }}/{{cover.id}}</el-tag>
+                                                                <el-tag v-else-if="cover.id==7" class="ml-2"
+                                                                    type="danger">差评如潮:{{ cover.vote
+                                                                    }}/{{cover.id}}</el-tag>
+                                                                <el-rate size="small"  />
+
+                                                            </el-space>
+
+                                                        </el-popover>
+
                                                     </div>
+
+
                                                 </a>
-                                                <div v-else class="bg-sky-300">
-                                                    <img :src="cover.url" alt="视频封面" class="cover">
-                                                    <p class="cover-description">{{ cover.description }}</p>
-                                                    <!-- 视频简介 -->
-                                                </div>
                                             </div>
 
                                         </div>
@@ -168,9 +187,9 @@
 
                     </el-main>
                     <el-footer class="bg-blue-600 h-16 fixed bottom-0 left-0 right-0">
-                        <el-text class="mx-1" type="primary">Made with <3</el-text>
-                    </br>
-                        <el-link href="about.html" target="_blank" class="mx-1" type="primary">About</el-link>
+                        <el-text class="mx-1" type="primary">Made with <3< /el-text>
+                                </br>
+                                <el-link href="about.html" target="_blank" class="mx-1" type="primary">About</el-link>
                     </el-footer>
 
                 </el-container>
@@ -336,7 +355,6 @@
         color:
             #333;
     }
-    
 </style>
 
 </html>
