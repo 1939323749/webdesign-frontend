@@ -12,8 +12,8 @@
     <script src="https://cdn.jsdelivr.net/npm/vuex@4"></script>
 </head>
 
-<body>
-    <header id="tougao" class="flex justify-between items-center bg-blue-600 p-4 fixed top-0 right-0 left-0">
+<body class="dark">
+    <header id="nav" class="flex justify-between items-center bg-blue-600 p-4 fixed top-0 right-0 left-0">
         <div id="logo" class="flex items-center">
             <div class="flex items-center">
                 <img src="https://p1.ssl.qhimg.com/t01cf7f93a00e61e5e9.jpg" class="w-12 h-12 mr-2" alt="Logo">
@@ -22,7 +22,8 @@
         <div class="flex items-center space-x-4">
             <form @submit.prevent="search" class="search">
                 <input type="text" v-model="searchTerm" placeholder="搜索..." class="bg-gray-200 px-4 py-2 rounded-l-lg">
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600">搜索</button>
+                <button type="submit"
+                    class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600">搜索</button>
             </form>
             <button @click="showInputBox"
                 class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 shadow-lg">投稿</button>
@@ -88,11 +89,12 @@
 
                 <!-- 投稿成功信息 -->
                 <div v-else>
-                    <div>{{$store.state.submitMessage}}</div>
+                    <el-result icon="success" title="投稿成功">
+                    </el-result>
                 </div>
-
-
             </div>
+
+
 
 
 
@@ -117,7 +119,6 @@
                     inputCategory: '', // 分类选择器的值
                     submitSuccess: false, // 投稿成功状态
                     submitMessage: null,
-                    searchTerm: '', // 搜索框的内容
                 };
             },
             mutations: {
@@ -178,10 +179,11 @@
         });
 
 
-        const tougao = Vue.createApp({
+        const nav = Vue.createApp({
             data() {
                 return {
                     inputText: '', // 输入框的内容
+                    searchTerm: '', // 搜索框的内容
                 };
             },
             methods: {
@@ -197,9 +199,9 @@
             },
         });
 
-        tougao.use(store);
-        tougao.use(ElementPlus);
-        tougao.mount('#tougao');
+        nav.use(store);
+        nav.use(ElementPlus);
+        nav.mount('#nav');
 
 
         const app = Vue.createApp({
@@ -225,8 +227,7 @@
                 }
             },
             methods: {
-
-                    showInputBox() {
+                showInputBox() {
                     this.$store.commit('toggleShow');
                 },
                 submit() {
