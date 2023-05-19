@@ -8,6 +8,7 @@
     <script src="https://unpkg.com/vue@3"></script>
     <!-- Import component library -->
     <script src="https://unpkg.com/element-plus"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <title>关于</title>
 </head>
@@ -56,12 +57,12 @@
                                         </el-select>
                                     </div>
                                     <div>
-                                        <el-row gutter="20">
-                                            <el-col span="20">
+                                        <el-row :gutter=20>
+                                            <el-col :span=12>
                                                 <button v-if="!submitMessage" @click="submit"
                                                     class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 shadow-lg">提交</button>
                                             </el-col>
-                                            <el-col span="20">
+                                            <el-col :span=12>
 
                                                 <button @click="dialogVisible = true"
                                                     class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 shadow-lg">取消</button>
@@ -337,6 +338,19 @@
             },
         },
         mounted() {
+            setTimeout(() => {
+                fetch('http://localhost:8080/api/getcategory')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+
+                        const categorySet = new Set(data.map(item => item.category));
+
+                        this.options = Array.from(categorySet).map(category => {
+                            return { value: category, label: category };
+                        });
+                    });
+            }, 200);
         },
     });
 
