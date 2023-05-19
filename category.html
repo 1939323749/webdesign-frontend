@@ -72,12 +72,12 @@
                                         </el-select>
                                     </div>
                                     <div>
-                                        <el-row gutter="20">
-                                            <el-col span="20">
+                                        <el-row :gutter=20>
+                                            <el-col :span=12>
                                                 <button v-if="!submitMessage" @click="submit"
                                                     class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 shadow-lg">提交</button>
                                             </el-col>
-                                            <el-col span="20">
+                                            <el-col :span=12>
 
                                                 <button @click="dialogVisible = true"
                                                     class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 shadow-lg">取消</button>
@@ -149,19 +149,30 @@
                                                                 <p class="cover-description">{{ cover.description }}</p>
                                                             </template>
                                                             <el-space direction="vertical">
-                                                                <el-tag v-if="cover.id==16" class="ml-2" 
-                                                                    type="success">好评如潮:{{ cover.vote
-                                                                    }}/{{cover.id}}</el-tag>
-                                                                <el-tag v-else-if="cover.id==17" class="ml-2"
-                                                                    type="info">褒贬不一:{{ cover.vote
-                                                                    }}/{{cover.id}}</el-tag>
-                                                                <el-tag v-else-if="cover.id==18" class="ml-2"
-                                                                    type="warning">多半差评:{{ cover.vote
-                                                                    }}/{{cover.id}}</el-tag>
-                                                                <el-tag v-else-if="cover.id==7" class="ml-2"
-                                                                    type="danger">差评如潮:{{ cover.vote
-                                                                    }}/{{cover.id}}</el-tag>
-                                                                <el-rate size="small"  />
+                                                                <div class="flex items-center">
+                                                                    <el-tag v-if="cover.rating>=4.5">
+                                                                        好评如潮:{{ cover.rating.toFixed(2) }}/5
+                                                                    </el-tag>
+                                                                    <el-tag v-else-if="cover.rating>=3.5" class="ml-2"
+                                                                        type="success">特别好评:{{ cover.rating.toFixed(2)
+                                                                        }}/5</el-tag>
+                                                                    <el-tag v-else-if="cover.rating>=3" class="ml-2"
+                                                                        type="info">多半好评:{{ cover.rating.toFixed(2)
+                                                                        }}/5</el-tag>
+                                                                    <el-tag v-else-if="cover.rating>=1.5" class="ml-2"
+                                                                        type="warning" class="text-sm">多半差评:{{
+                                                                        cover.rating.toFixed(2)
+                                                                        }}/5</el-tag>
+                                                                        <el-tag v-else-if="cover.ratingCount===0" class="ml-2"
+                                                                            type="info" class="text-sm">暂时没有评分</el-tag>
+                                                                    <el-tag v-else class="ml-2" type="danger">差评如潮:{{
+                                                                        cover.rating.toFixed(2)
+                                                                        }}/5</el-tag>
+                                                                </div>
+
+                                                                <el-rate size="small" :value="cover.rating"
+                                                                    @change="updateRating(cover.bvid, $event)" />
+
 
                                                             </el-space>
 
@@ -196,13 +207,6 @@
 
             </el-container>
         </el-container>
-
-
-
-
-
-
-
     </div>
 </body>
 <script>
@@ -224,7 +228,8 @@
                 inputCategory: '',
                 submitSuccess: false,
                 submitMessage: null,
-                dialogVisible: false
+                dialogVisible: false,
+                rating: 5,
             };
         },
         methods: {
@@ -253,6 +258,26 @@
             handleConfirm() {
                 this.dialogVisible = false;
                 this.hideInputBox();
+            },
+            updateRating(bvid, rating) {
+                // Update rating locally
+                let cover = this.covers.find(cover => cover.bvid === bvid);
+
+                if (cover === undefined) {
+                    console.error(`No video with bvid: ${bvid} found.`);
+                    return;
+                }
+
+
+
+                axios.put('http://localhost:8080/api/put/ratebybvid', {
+                    bvid: cover.bvid,
+                    rating: rating,
+                }).then(response => {
+                    cover.rating = response.data.rating;
+                }).catch(error => {
+                    console.error(error);
+                });
             },
             async submit() {
                 if (!this.inputUrl || !this.inputCategory) {
@@ -339,7 +364,6 @@
         object-fit: cover;
         /* 让图片铺满整个容器 */
     }
-
     .bw-mask {
         filter: grayscale(100%);
     }
