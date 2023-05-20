@@ -42,7 +42,7 @@
                                 <p class="text-lg text-center">分类</p>
                                 <ul class="list-none m-0 p-0">
                                     <li class="my-2" v-for="option in options" :key="option.value">
-                                        <a href="#"
+                                        <a :href="'category.html?c=' + option.value" target="_blank"
                                             class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:drop-shadow-lg">{{
                                             option.label }}</a>
                                     </li>
