@@ -178,33 +178,36 @@
                                                                 </template>
                                                                 <el-space direction="vertical">
                                                                     <div class="flex items-center">
-                                                                        <el-tag v-if="cover.rating>=4.5">好评如潮:{{
-                                                                            cover.rating.toFixed(2) }}/5</el-tag>
+                                                                        <el-tag v-if="cover.ratingCount===0"
+                                                                            class="ml-2 text-sm" type="info">暂时没有评分</el-tag>
+                                                                        <el-tag v-else-if="cover.rating>=4.5">
+                                                                            好评如潮:{{ cover.rating.toFixed(2) }}/5
+                                                                        </el-tag>
                                                                         <el-tag v-else-if="cover.rating>=3.5"
-                                                                            class="ml-2" type="success">特别好评:{{
+                                                                            class="ml-2 text-sm" type="success">特别好评:{{
                                                                             cover.rating.toFixed(2)
                                                                             }}/5</el-tag>
-                                                                        <el-tag v-else-if="cover.rating>=3" class="ml-2"
-                                                                            type="info">多半好评:{{
+                                                                        <el-tag v-else-if="cover.rating>=3"
+                                                                            class="ml-2 text-sm" type="info">多半好评:{{
                                                                             cover.rating.toFixed(2)
                                                                             }}/5</el-tag>
                                                                         <el-tag v-else-if="cover.rating>=1.5"
-                                                                            class="ml-2" type="warning"
-                                                                            class="text-sm">多半差评:{{
+                                                                            class="ml-2 text-sm" type="warning">多半差评:{{
                                                                             cover.rating.toFixed(2)
                                                                             }}/5</el-tag>
-
-                                                                        <el-tag v-else-if="cover.ratingCount===0"
-                                                                            class="ml-2" type="info"
-                                                                            class="text-sm">暂时没有评分</el-tag>
-                                                                        <el-tag v-else class="ml-2"
+    
+                                                                        <el-tag v-else class="ml-2 text-sm"
                                                                             type="danger">差评如潮:{{
                                                                             cover.rating.toFixed(2)
                                                                             }}/5</el-tag>
+    
                                                                     </div>
                                                                     <el-rate size="small" :value="cover.rating"
                                                                         @change="updateRating(cover.bvid, $event)" />
+    
+    
                                                                 </el-space>
+    
                                                             </el-popover>
                                                         </div>
                                                     </a>
@@ -278,10 +281,11 @@
                                 <div v-else>
                                     <el-empty />
                                 </div>
-                                <div v-if="covers">    
+                                <div v-if="covers">
                                     <el-space style="display: flex; justify-content: center; align-items: center;">
                                         <div v-show="loaded">
-                                            <el-pagination background layout="prev, pager, next" :total="covers.length" @current-change="handlePageChange" />
+                                            <el-pagination background layout="prev, pager, next" :total="covers.length"
+                                                @current-change="handlePageChange" />
                                         </div>
                                     </el-space>
                                 </div>

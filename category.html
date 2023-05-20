@@ -52,7 +52,7 @@
                     </el-aside>
                 </el-container>
                 <el-container>
-                    <el-main>
+                    <el-main style="padding-bottom: 5rem;">
                         <el-container v-if="show"
                             class="input-box fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-4"
                             style="z-index: 1000">
@@ -136,7 +136,7 @@
                                     <el-space fill="fill">
                                         <div
                                             class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
-                                            <div v-for="cover in covers" :key="`cover-${cover.id}`"
+                                            <div v-for="cover in paginatedCovers" :key="`cover-${cover.id}`"
                                                 class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
                                                 <a :href="'https://www.bilibili.com/video/' + cover.bvid"
                                                     target="_blank">
@@ -149,27 +149,30 @@
                                                             </template>
                                                             <el-space direction="vertical">
                                                                 <div class="flex items-center">
-                                                                    <el-tag v-if="cover.rating>=4.5">
+                                                                    <el-tag v-if="cover.ratingCount===0"
+                                                                        class="ml-2 text-sm" type="info">暂时没有评分</el-tag>
+                                                                    <el-tag v-else-if="cover.rating>=4.5">
                                                                         好评如潮:{{ cover.rating.toFixed(2) }}/5
                                                                     </el-tag>
-                                                                    <el-tag v-else-if="cover.rating>=3.5" class="ml-2"
-                                                                        type="success">特别好评:{{ cover.rating.toFixed(2)
-                                                                        }}/5</el-tag>
-                                                                    <el-tag v-else-if="cover.rating>=3" class="ml-2"
-                                                                        type="info">多半好评:{{ cover.rating.toFixed(2)
-                                                                        }}/5</el-tag>
-                                                                    <el-tag v-else-if="cover.rating>=1.5" class="ml-2"
-                                                                        type="warning" class="text-sm">多半差评:{{
+                                                                    <el-tag v-else-if="cover.rating>=3.5"
+                                                                        class="ml-2 text-sm" type="success">特别好评:{{
                                                                         cover.rating.toFixed(2)
                                                                         }}/5</el-tag>
-                                                                    <el-tag v-else-if="cover.ratingCount===0"
-                                                                        class="ml-2" type="info"
-                                                                        class="text-sm">暂时没有评分</el-tag>
-                                                                    <el-tag v-else class="ml-2" type="danger">差评如潮:{{
+                                                                    <el-tag v-else-if="cover.rating>=3"
+                                                                        class="ml-2 text-sm" type="info">多半好评:{{
                                                                         cover.rating.toFixed(2)
                                                                         }}/5</el-tag>
-                                                                </div>
+                                                                    <el-tag v-else-if="cover.rating>=1.5"
+                                                                        class="ml-2 text-sm" type="warning">多半差评:{{
+                                                                        cover.rating.toFixed(2)
+                                                                        }}/5</el-tag>
 
+                                                                    <el-tag v-else class="ml-2 text-sm"
+                                                                        type="danger">差评如潮:{{
+                                                                        cover.rating.toFixed(2)
+                                                                        }}/5</el-tag>
+
+                                                                </div>
                                                                 <el-rate size="small" :value="cover.rating"
                                                                     @change="updateRating(cover.bvid, $event)" />
 
@@ -190,12 +193,17 @@
                                 <div v-else>
                                     <el-empty />
                                 </div>
+                                <div v-if="covers">
+                                    <el-space style="display: flex; justify-content: center; align-items: center;">
+                                        <div v-show="loaded">
+                                            <el-pagination background layout="prev, pager, next" :total="covers.length"
+                                                @current-change="handlePageChange" />
+                                        </div>
+                                    </el-space>
+                                </div>
 
                             </div>
-
-
                         </el-space>
-
                     </el-main>
                     <el-footer class="bg-blue-600 h-16 fixed bottom-0 left-0 right-0">
                         <el-text class="mx-1" type="primary">Made with <3< /el-text>
@@ -205,7 +213,6 @@
                     </el-footer>
 
                 </el-container>
-
             </el-container>
         </el-container>
     </div>
@@ -231,7 +238,16 @@
                 submitMessage: null,
                 dialogVisible: false,
                 rating: 5,
+                itemsPerPage: 4,
+                currentPage: 1,
             };
+        },
+        computed: {
+            paginatedCovers() {
+                const start = (this.currentPage - 1) * this.itemsPerPage;
+                const end = start + this.itemsPerPage;
+                return this.covers.slice(start, end);
+            },
         },
         methods: {
             search: function () {
@@ -314,6 +330,9 @@
                     console.error(error);
                 }
             },
+            handlePageChange(page) {
+                this.currentPage = page;
+            },
         },
         mounted() {
             const loading = ElLoading.service({
@@ -354,7 +373,7 @@
         // 使用查询参数来改变页面的内容
         document.getElementById("logo").innerHTML = "<h1 class=\"text-white text-lg \">" + c + "</h1>"
     } else {
-        document.getElementById("logo").innerHTML = "No category specified";
+        document.getElementById("logo").innerHTML = "<h1 class=\"text-white text-lg \">" + "神马都没有" + "</h1>"
     }
 </script>
 
