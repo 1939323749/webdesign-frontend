@@ -196,7 +196,7 @@
                                 <div v-if="covers">
                                     <el-space style="display: flex; justify-content: center; align-items: center;">
                                         <div v-show="loaded">
-                                            <el-pagination background layout="prev, pager, next" :total="covers.length"
+                                            <el-pagination background layout="prev, pager, next" :total="covers.length" :page-size="itemsPerPage" :current-page="currentPage"
                                                 @current-change="handlePageChange" />
                                         </div>
                                     </el-space>

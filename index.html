@@ -125,10 +125,6 @@
                             <div v-if="!loaded">
                                 <el-skeleton />
                                 <br />
-                                <el-skeleton style="--el-skeleton-circle-size: 100px">
-                                    <template #template>
-                                        <el-skeleton-item variant="circle" />
-                                    </template>
                                 </el-skeleton>
                             </div>
 
@@ -179,7 +175,8 @@
                                                                 <el-space direction="vertical">
                                                                     <div class="flex items-center">
                                                                         <el-tag v-if="cover.ratingCount===0"
-                                                                            class="ml-2 text-sm" type="info">暂时没有评分</el-tag>
+                                                                            class="ml-2 text-sm"
+                                                                            type="info">暂时没有评分</el-tag>
                                                                         <el-tag v-else-if="cover.rating>=4.5">
                                                                             好评如潮:{{ cover.rating.toFixed(2) }}/5
                                                                         </el-tag>
@@ -195,19 +192,19 @@
                                                                             class="ml-2 text-sm" type="warning">多半差评:{{
                                                                             cover.rating.toFixed(2)
                                                                             }}/5</el-tag>
-    
+
                                                                         <el-tag v-else class="ml-2 text-sm"
                                                                             type="danger">差评如潮:{{
                                                                             cover.rating.toFixed(2)
                                                                             }}/5</el-tag>
-    
+
                                                                     </div>
                                                                     <el-rate size="small" :value="cover.rating"
                                                                         @change="updateRating(cover.bvid, $event)" />
-    
-    
+
+
                                                                 </el-space>
-    
+
                                                             </el-popover>
                                                         </div>
                                                     </a>
@@ -283,8 +280,8 @@
                                 </div>
                                 <div v-if="covers">
                                     <el-space style="display: flex; justify-content: center; align-items: center;">
-                                        <div v-show="loaded">
-                                            <el-pagination background layout="prev, pager, next" :total="covers.length"
+                                        <div v-if="loaded">
+                                            <el-pagination background layout="prev, pager, next" :total="covers.length" :page-size="itemsPerPage" :current-page="currentPage"
                                                 @current-change="handlePageChange" />
                                         </div>
                                     </el-space>
@@ -333,7 +330,7 @@
                 rating: 5,
                 sortedcovers: [],
                 carouselcovers: [],
-                itemsPerPage: 24,
+                itemsPerPage: 4,
                 currentPage: 1,
             };
         },
@@ -464,9 +461,7 @@
                     .then(response => response.json())
                     .then(data => {
                         this.covers = data;
-                        console.log(data);
-                        console.log('this.covers1');
-                        console.log(this.covers);
+                        console.log(this.covers.length);
 
                         const categorySet = new Set(data.map(item => item.category));
 
@@ -488,8 +483,8 @@
                         this.carouselcovers = this.covers.sort((a, b) => {
                             return b.rating - a.rating;
                         }).slice(0, 4);
-                        console.log('this.carouselcovers');
-                        console.log(this.carouselcovers);
+                        console.log('length');
+                        console.log();
                         this.loaded = true;
                         loading.close();
                     });
