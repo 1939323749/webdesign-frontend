@@ -53,7 +53,7 @@
                     </el-aside>
                 </el-container>
                 <el-container>
-                    <el-main style="padding-bottom: 4rem;">
+                    <el-main style="padding-bottom: 5rem;">
                         <el-container v-if="show"
                             class="input-box fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-4"
                             style="z-index: 1000">
@@ -215,7 +215,7 @@
                                     <el-space fill="fill">
                                         <div
                                             class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
-                                            <div v-for="cover in sortedcovers" :key="`cover-${cover.id}`"
+                                            <div v-for="cover in paginatedCovers" :key="`cover-${cover.id}`"
                                                 class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
                                                 <a :href="'https://www.bilibili.com/video/' + cover.bvid"
                                                     target="_blank">
@@ -278,13 +278,13 @@
                                 <div v-else>
                                     <el-empty />
                                 </div>
-                                <el-space>
-                                    <div v-show="loaded">
-
-                                        <el-pagination background layout="prev, pager, next" :total="" />
-
-                                    </div>
-                                </el-space>
+                                <div v-if="covers">    
+                                    <el-space style="display: flex; justify-content: center; align-items: center;">
+                                        <div v-show="loaded">
+                                            <el-pagination background layout="prev, pager, next" :total="covers.length" @current-change="handlePageChange" />
+                                        </div>
+                                    </el-space>
+                                </div>
 
                             </div>
 
@@ -329,7 +329,16 @@
                 rating: 5,
                 sortedcovers: [],
                 carouselcovers: [],
+                itemsPerPage: 24,
+                currentPage: 1,
             };
+        },
+        computed: {
+            paginatedCovers() {
+                const start = (this.currentPage - 1) * this.itemsPerPage;
+                const end = start + this.itemsPerPage;
+                return this.sortedcovers.slice(start, end);
+            },
         },
         methods: {
             search: function () {
@@ -435,6 +444,9 @@
                 } catch (error) {
                     console.error(error);
                 }
+            },
+            handlePageChange(page) {
+                this.currentPage = page;
             },
         },
         mounted() {
