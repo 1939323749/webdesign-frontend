@@ -10,16 +10,17 @@
     <script src="https://unpkg.com/element-plus"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <title>分类</title>
+    <title>首页</title>
 </head>
 
-<body class="p-10">
+<body>
     <div id="app">
         <el-container>
             <el-header>
                 <header class="h-16 flex justify-between items-center bg-blue-600 p-4 fixed top-0 right-0 left-0">
                     <div id="logo" class="flex items-center">
                         <div class="flex items-center">
+                            <p>首页</p>
                         </div>
                     </div>
                     <div class="flex items-center space-x-4">
@@ -42,7 +43,7 @@
                                 <p class="text-lg text-center">分类</p>
                                 <ul class="list-none m-0 p-0">
                                     <li class="my-2" v-for="option in options" :key="option.value">
-                                        <a href="#"
+                                        <a :href="'category.html?c=' + option.value" target="_blank"
                                             class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:drop-shadow-lg">{{
                                             option.label }}</a>
                                     </li>
@@ -133,10 +134,39 @@
 
                             <div v-else>
                                 <div v-if="covers">
+                                    <div v-for="(group, index) in groupedCovers" :key="`group-${index}`">
+                                        <div
+                                            class="separator flex justify-between items-center bg-gray-300 p-2 rounded-lg shadow-lg my-2">
+                                            <span class="text-lg">{{ group.category }}</span>
+                                            <button @click="loadMore(group.category)"
+                                                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">更多</button>
+                                        </div>
+                                        <div
+                                            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
+                                            <div v-for="cover in group.covers" :key="`cover-${cover.id}`"
+                                                class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
+                                                <a v-if="cover.bvid"
+                                                    :href="'https://www.bilibili.com/video/' + cover.bvid"
+                                                    target="_blank">
+                                                    <div class="bg-sky-300">
+                                                        <img :src="cover.url" alt="视频封面" class="cover">
+                                                        <p class="cover-description">{{ cover.description }}</p>
+                                                        <!-- 视频简介 -->
+                                                    </div>
+                                                </a>
+                                                <div v-else class="bg-sky-300">
+                                                    <img :src="cover.url" alt="视频封面" class="cover">
+                                                    <p class="cover-description">{{ cover.description }}</p>
+                                                    <!-- 视频简介 -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <el-space fill="fill">
                                         <div
                                             class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
-                                            <div v-for="cover in covers" :key="`cover-${cover.id}`"
+                                            <div v-for="cover in sortedcovers" :key="`cover-${cover.id}`"
                                                 class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
                                                 <a :href="'https://www.bilibili.com/video/' + cover.bvid"
                                                     target="_blank">
@@ -145,7 +175,8 @@
                                                         <el-popover placement="bottom-start" :width="200"
                                                             trigger="hover" :content="cover.description">
                                                             <template #reference>
-                                                                <p class="cover-description">{{ cover.description }}</p>
+                                                                <p class="cover-description">{{
+                                                                    cover.description }}</p>
                                                             </template>
                                                             <el-space direction="vertical">
                                                                 <div class="flex items-center">
@@ -153,10 +184,12 @@
                                                                         好评如潮:{{ cover.rating.toFixed(2) }}/5
                                                                     </el-tag>
                                                                     <el-tag v-else-if="cover.rating>=3.5" class="ml-2"
-                                                                        type="success">特别好评:{{ cover.rating.toFixed(2)
+                                                                        type="success">特别好评:{{
+                                                                        cover.rating.toFixed(2)
                                                                         }}/5</el-tag>
                                                                     <el-tag v-else-if="cover.rating>=3" class="ml-2"
-                                                                        type="info">多半好评:{{ cover.rating.toFixed(2)
+                                                                        type="info">多半好评:{{
+                                                                        cover.rating.toFixed(2)
                                                                         }}/5</el-tag>
                                                                     <el-tag v-else-if="cover.rating>=1.5" class="ml-2"
                                                                         type="warning" class="text-sm">多半差评:{{
@@ -168,8 +201,8 @@
                                                                     <el-tag v-else class="ml-2" type="danger">差评如潮:{{
                                                                         cover.rating.toFixed(2)
                                                                         }}/5</el-tag>
-                                                                </div>
 
+                                                                </div>
                                                                 <el-rate size="small" :value="cover.rating"
                                                                     @change="updateRating(cover.bvid, $event)" />
 
@@ -185,15 +218,18 @@
                                             </div>
 
                                         </div>
+
                                     </el-space>
+
+
+
+
                                 </div>
                                 <div v-else>
                                     <el-empty />
                                 </div>
 
                             </div>
-
-
                         </el-space>
 
                     </el-main>
@@ -231,6 +267,7 @@
                 submitMessage: null,
                 dialogVisible: false,
                 rating: 5,
+                sortedcovers: [],
             };
         },
         methods: {
@@ -269,6 +306,7 @@
                     return;
                 }
 
+                console.log(`Update rating of ${bvid} to ${rating}`);
 
 
                 axios.put('http://localhost:8080/api/put/ratebybvid', {
@@ -280,6 +318,23 @@
                     console.error(error);
                 });
             },
+            groupCovers(covers) {
+                let grouped = {};
+                covers.forEach((cover) => {
+                    if (!(cover.category in grouped)) {
+                        grouped[cover.category] = [];
+                    }
+                    grouped[cover.category].push(cover);
+                });
+
+                // 将每个分类的封面限制为前 12 个
+                for (let category in grouped) {
+                    grouped[category] = grouped[category].slice(0, 12);
+                }
+
+                return Object.entries(grouped).map(([category, covers]) => ({ category, covers }));
+            },
+
             async submit() {
                 if (!this.inputUrl || !this.inputCategory) {
                     this.submitSuccess = false;
@@ -322,40 +377,39 @@
                 background: 'rgba(0, 0, 0, 0.7)',
             });
             setTimeout(() => {
-                fetch('http://localhost:8080/api/getvbyc?c=' + c)
+                fetch('http://localhost:8080/api/getvideo')
                     .then(response => response.json())
                     .then(data => {
                         this.covers = data;
                         console.log(data);
+                        console.log('this.covers1');
+                        console.log(this.covers);
 
                         const categorySet = new Set(data.map(item => item.category));
 
                         this.options = Array.from(categorySet).map(category => {
                             return { value: category, label: category };
                         });
+                    }).then(() => {
+                        this.groupedCovers = this.groupCovers(this.covers);
+                        console.log('this.covers2');
+                        console.log(this.covers);
+                        console.log(this.groupedCovers);
+                        //按时间先后排序
+                        this.sortedcovers = this.covers.sort((a, b) => {
+                            return new Date(b.time) - new Date(a.time);
+                        });
+                        console.log('this.sortedcovers');
+                        console.log(this.sortedcovers);
+                        this.loaded = true;
+                        loading.close();
                     });
-                this.loaded = true;
-                loading.close();
             }, 2000);
         },
     });
 
     app.use(ElementPlus);
     app.mount('#app');
-
-    // 获取当前URL
-    var url = new URL(window.location.href);
-
-    // 获取查询参数
-    var c = url.searchParams.get("c");
-
-    // 如果参数存在
-    if (c) {
-        // 使用查询参数来改变页面的内容
-        document.getElementById("logo").innerHTML = "<h1 class=\"text-white text-lg \">" + c + "</h1>"
-    } else {
-        document.getElementById("logo").innerHTML = "No category specified";
-    }
 </script>
 
 <style>
