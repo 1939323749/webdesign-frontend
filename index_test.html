@@ -134,34 +134,68 @@
 
                             <div v-else>
                                 <div v-if="covers">
-                                    <div v-for="(group, index) in groupedCovers" :key="`group-${index}`">
-                                        <div
-                                            class="separator flex justify-between items-center bg-gray-300 p-2 rounded-lg shadow-lg my-2">
-                                            <span class="text-lg">{{ group.category }}</span>
-                                            <button @click="loadMore(group.category)"
-                                                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">更多</button>
-                                        </div>
-                                        <div
-                                            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
-                                            <div v-for="cover in group.covers" :key="`cover-${cover.id}`"
-                                                class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
+                                    <div class="block text-center">
+                                        <el-carousel>
+                                            <el-carousel-item v-for="cover in carouselcovers" :key="cover.id">
                                                 <a v-if="cover.bvid"
                                                     :href="'https://www.bilibili.com/video/' + cover.bvid"
-                                                    target="_blank">
-                                                    <div class="bg-sky-300">
-                                                        <img :src="cover.url" alt="视频封面" class="cover">
-                                                        <p class="cover-description">{{ cover.description }}</p>
-                                                        <!-- 视频简介 -->
-                                                    </div>
+                                                    target="_blank" class="bg-sky-300">
+                                                    <img :src="cover.url" alt="视频封面" class="cover">
+                                                    <p class="cover-description">{{ cover.description }}</p>
+                                                    <!-- 视频简介 -->
                                                 </a>
                                                 <div v-else class="bg-sky-300">
                                                     <img :src="cover.url" alt="视频封面" class="cover">
                                                     <p class="cover-description">{{ cover.description }}</p>
                                                     <!-- 视频简介 -->
                                                 </div>
-                                            </div>
-                                        </div>
+                                            </el-carousel-item>
+                                        </el-carousel>
+
+
                                     </div>
+                                    <div v-for="(group, index) in groupedCovers" :key="`group-${index}`">
+                                        <div
+                                            class="separator flex justify-between items-center bg-gray-300 p-2 rounded-lg shadow-lg my-2">
+                                            <span class="text-lg">{{ group.category }}</span>
+                                            <a :href="'category.html?c=' + group.category" target="_blank"
+                                                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">更多</a>
+                                        </div>
+                                        <el-space fill="fill">
+                                            <div
+                                                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
+                                                <div v-for="cover in group.covers" :key="`cover-${cover.id}`"
+                                                    class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
+                                                    <a :href="'https://www.bilibili.com/video/' + cover.bvid"
+                                                        target="_blank">
+                                                        <div class="bg-sky-300">
+                                                            <img :src="cover.url" alt="视频封面" class="cover">
+                                                            <el-popover placement="bottom-start" :width="200"
+                                                                trigger="hover" :content="cover.description">
+                                                                <template #reference>
+                                                                    <p class="cover-description">{{ cover.description }}
+                                                                    </p>
+                                                                </template>
+                                                                <el-space direction="vertical">
+                                                                    <div class="flex items-center">
+                                                                        <el-tag v-if="cover.rating>=4.5">好评如潮:{{
+                                                                            cover.rating.toFixed(2) }}/5</el-tag>
+                                                                        <!-- 其他评分显示方式按需添加 -->
+                                                                        <el-tag v-else-if="cover.ratingCount===0"
+                                                                            class="ml-2" type="info"
+                                                                            class="text-sm">暂时没有评分</el-tag>
+                                                                    </div>
+                                                                    <el-rate size="small" :value="cover.rating"
+                                                                        @change="updateRating(cover.bvid, $event)" />
+                                                                </el-space>
+                                                            </el-popover>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </el-space>
+                                    </div>
+
 
                                     <el-space fill="fill">
                                         <div
@@ -268,6 +302,7 @@
                 dialogVisible: false,
                 rating: 5,
                 sortedcovers: [],
+                carouselcovers: [],
             };
         },
         methods: {
@@ -326,6 +361,12 @@
                     }
                     grouped[cover.category].push(cover);
                 });
+                //按rating排序
+                for (let category in grouped) {
+                    grouped[category] = grouped[category].sort((a, b) => {
+                        return b.rating - a.rating;
+                    });
+                }
 
                 // 将每个分类的封面限制为前 12 个
                 for (let category in grouped) {
@@ -401,6 +442,11 @@
                         });
                         console.log('this.sortedcovers');
                         console.log(this.sortedcovers);
+                        this.carouselcovers = this.covers.sort((a, b) => {
+                            return b.rating - a.rating;
+                        }).slice(0, 4);
+                        console.log('this.carouselcovers');
+                        console.log(this.carouselcovers);
                         this.loaded = true;
                         loading.close();
                     });
