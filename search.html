@@ -358,13 +358,24 @@
 
                         const categorySet = new Set(data.map(item => item.category));
 
+
+                    });
+
+                fetch('http://localhost:8080/api/getcategory')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+
+                        const categorySet = new Set(data.map(item => item.category));
                         this.options = Array.from(categorySet).map(category => {
                             return { value: category, label: category };
                         });
+                        console.log(this.options);
                     });
+
                 this.loaded = true;
                 loading.close();
-            }, 2000);
+            }, 1000);
         },
     });
 
