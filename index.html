@@ -3,411 +3,484 @@
 <head>
     <!-- Import style -->
     <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/theme-chalk/display.css">
     <!-- Import Vue 3 -->
     <script src="https://unpkg.com/vue@3"></script>
     <!-- Import component library -->
     <script src="https://unpkg.com/element-plus"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vuex@4"></script>
+    <title>首页</title>
 </head>
 
-<body class="dark">
-    <header id="nav" class="flex justify-between items-center bg-blue-600 p-4 fixed top-0 right-0 left-0">
-        <div id="logo" class="flex items-center">
-            <div class="flex items-center">
-                <img src="https://p1.ssl.qhimg.com/t01cf7f93a00e61e5e9.jpg" class="w-12 h-12 mr-2" alt="Logo">
-            </div>
-        </div>
-        <div class="flex items-center space-x-4">
-            <form @submit.prevent="search" class="search">
-                <input type="text" v-model="searchTerm" placeholder="搜索..." class="bg-gray-200 px-4 py-2 rounded-l-lg">
-                <button type="submit"
-                    class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600">搜索</button>
-            </form>
-            <button @click="showInputBox"
-                class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 shadow-lg">投稿</button>
-        </div>
-    </header>
-
-    <div class="flex" id="app">
-        <nav class="bg-blue-500 text-white p-4 fixed top-16 left-0 bottom-16 w-48 rounded-r-lg">
-            <div class="bg-sky-300 rounded-lg shadow-lg">
-                <p class="text-lg text-center">分类</p>
-                <ul class="list-none m-0 p-0">
-                    <li class="my-2" v-for="option in options" :key="option.value">
-                        <a :href="'category.html?c=' + option.value" target="_blank"
-                            class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:drop-shadow-lg">{{ option.label
-                            }}</a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-        <main class="bg-gray-200 fixed top-16 bottom-16 left-32 right-0 overflow-y-auto" style="overflow-x: hidden;">
-            <div class="px-4 py-2">
-                <div v-for="(group, index) in groupedCovers" :key="`group-${index}`">
-                    <div class="separator flex justify-between items-center bg-gray-300 p-2 rounded-lg shadow-lg">
-                        <span class="text-lg">{{ group.category }}</span>
-                        <button @click="loadMore(group.category)"
-                            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">更多</button>
-                    </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
-                        <div v-for="cover in group.covers" :key="`cover-${cover.id}`"
-                            class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
-                            <a v-if="cover.bvid" :href="'https://www.bilibili.com/video/' + cover.bvid" target="_blank">
-                                <div class="bg-sky-300">
-                                    <img :src="cover.url" alt="视频封面" class="cover">
-                                    <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
-                                </div>
-                            </a>
-                            <div v-else class="bg-sky-300">
-                                <img :src="cover.url" alt="视频封面" class="cover">
-                                <p class="cover-description">{{ cover.description }}</p> <!-- 视频简介 -->
-                            </div>
+<body>
+    <div id="app">
+        <el-container>
+            <el-header>
+                <header class="h-16 flex justify-between items-center bg-blue-600 p-4 fixed top-0 right-0 left-0">
+                    <div id="logo" class="flex items-center">
+                        <div class="flex items-center">
+                            <p>首页</p>
                         </div>
                     </div>
-                </div>
-            </div>
+                    <div class="flex items-center space-x-4">
+                        <form @submit.prevent="search" class="search">
+                            <input type="text" v-model="searchTerm" placeholder="搜索..."
+                                class="bg-gray-200 px-4 py-2 rounded-l-lg">
+                            <button type="submit"
+                                class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600">搜索</button>
+                        </form>
+                        <button @click="toggleShow"
+                            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 shadow-lg">投稿</button>
+
+                </header>
+            </el-header>
+            <el-container class="bg-slate-100 fixed bottom-0 top-16 right-0 left-0" fill="fill">
+                <el-container>
+                    <el-aside class="bg-blue-500 text-white p-4 fixed top-16 left-0 bottom-16 w-48 rounded-r-lg">
+                        <nav>
+                            <div class="bg-sky-300 rounded-lg shadow-lg">
+                                <p class="text-lg text-center">分类</p>
+                                <ul class="list-none m-0 p-0">
+                                    <li class="my-2" v-for="option in options" :key="option.value">
+                                        <a :href="'category.html?c=' + option.value" target="_blank"
+                                            class="block py-2 px-4 rounded-lg hover:bg-blue-600 hover:drop-shadow-lg">{{
+                                            option.label }}</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </nav>
+                    </el-aside>
+                </el-container>
+                <el-container>
+                    <el-main>
+                        <el-container v-if="show"
+                            class="input-box fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-4"
+                            style="z-index: 1000">
+                            <div v-if="!submitMessage">
+                                <!-- 添加URL输入框 -->
+                                <el-space direction="vertical">
+                                    <div>
+                                        <input type="text" v-model="inputUrl" placeholder="请输入URL"
+                                            class="w-full p-2 border rounded-lg mb-2">
+                                    </div>
+                                    <div>
+                                        <!-- 添加分类选择器 -->
+                                        <el-select v-model="inputCategory" class="m-2" placeholder="Select"
+                                            size="large">
+                                            <el-option v-for="item in options" :key="item.value" :label="item.label"
+                                                :value="item.value" />
+                                        </el-select>
+                                    </div>
+                                    <div>
+                                        <el-row :gutter=20>
+                                            <el-col :span=12>
+                                                <button v-if="!submitMessage" @click="submit"
+                                                    class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 shadow-lg">提交</button>
+                                            </el-col>
+                                            <el-col :span=12>
+
+                                                <button @click="dialogVisible = true"
+                                                    class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 shadow-lg">取消</button>
+                                            </el-col>
+                                        </el-row>
+
+                                    </div>
+                                </el-space>
 
 
-            <!-- 在这里添加 'fixed', 'top-1/2', 'left-1/2', 'transform', '-translate-x-1/2', '-translate-y-1/2' 这些样式 -->
-            <div v-if="$store.state.show"
-                class="input-box fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-4">
-                <div v-if="!$store.state.submitMessage">
-                    <!-- 添加URL输入框 -->
-                    <input type="text" v-model="$store.state.inputUrl" placeholder="请输入URL"
-                        class="w-full p-2 border rounded-lg mb-2">
-                    <!-- 添加分类选择器 -->
-                    <el-select v-model="$store.state.inputCategory" class="m-2" placeholder="Select" size="large">
-                        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-                    </el-select>
-                    <button v-if="!$store.state.submitMessage" @click="submit"
-                        class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-1/2 shadow-lg">提交</button>
-                    <button @click="$store.commit('hideInputBox')"
-                        class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 w-1/2 shadow-lg">取消</button>
-                </div>
 
-                <!-- 投稿成功信息 -->
-                <div v-else>
-                    <el-result icon="success" title="投稿成功">
-                    </el-result>
-                </div>
-            </div>
+                            </div>
+
+                            <!-- 投稿成功信息 -->
+                            <div v-else>
+                                <div v-if="submitSuccess">
+                                    <el-result icon="success" :title="submitMessage"></el-result>
+                                </div>
+                                <div v-else>
+                                    <el-result icon="error" :title="submitMessage"></el-result>
+                                </div>
+                            </div>
 
 
+                        </el-container>
+                        <div>
+                            <el-dialog v-model="dialogVisible" title="Tips" width="30%" draggable>
+                                <span>确定取消吗</span>
+                                <template #footer>
+                                    <span class="dialog-footer">
+                                        <el-button @click="dialogVisible = false">Cancel</el-button>
+                                        <el-button type="primary" @click="handleConfirm" class="text-black">
+                                            确定
+                                        </el-button>
+                                    </span>
+                                </template>
+                            </el-dialog>
+                        </div>
 
 
 
 
+                        <el-space class="ml-48">
+                            <div v-if="!loaded">
+                                <el-skeleton />
+                                <br />
+                                <el-skeleton style="--el-skeleton-circle-size: 100px">
+                                    <template #template>
+                                        <el-skeleton-item variant="circle" />
+                                    </template>
+                                </el-skeleton>
+                            </div>
+
+                            <div v-else>
+                                <div v-if="covers">
+                                    <div class="block text-center">
+                                        <el-carousel>
+                                            <el-carousel-item v-for="cover in carouselcovers" :key="cover.id">
+                                                <a v-if="cover.bvid"
+                                                    :href="'https://www.bilibili.com/video/' + cover.bvid"
+                                                    target="_blank" class="bg-sky-300">
+                                                    <img :src="cover.url" alt="视频封面" class="cover">
+                                                    <p class="cover-description">{{ cover.description }}</p>
+                                                    <!-- 视频简介 -->
+                                                </a>
+                                                <div v-else class="bg-sky-300">
+                                                    <img :src="cover.url" alt="视频封面" class="cover">
+                                                    <p class="cover-description">{{ cover.description }}</p>
+                                                    <!-- 视频简介 -->
+                                                </div>
+                                            </el-carousel-item>
+                                        </el-carousel>
 
 
-        </main>
+                                    </div>
+                                    <div v-for="(group, index) in groupedCovers" :key="`group-${index}`">
+                                        <div
+                                            class="separator flex justify-between items-center bg-gray-300 p-2 rounded-lg shadow-lg my-2">
+                                            <span class="text-lg">{{ group.category }}</span>
+                                            <a :href="'category.html?c=' + group.category" target="_blank"
+                                                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">更多</a>
+                                        </div>
+                                        <el-space fill="fill">
+                                            <div
+                                                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
+                                                <div v-for="cover in group.covers" :key="`cover-${cover.id}`"
+                                                    class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
+                                                    <a :href="'https://www.bilibili.com/video/' + cover.bvid"
+                                                        target="_blank">
+                                                        <div class="bg-sky-300">
+                                                            <img :src="cover.url" alt="视频封面" class="cover">
+                                                            <el-popover placement="bottom-start" :width="200"
+                                                                trigger="hover" :content="cover.description">
+                                                                <template #reference>
+                                                                    <p class="cover-description">{{ cover.description }}
+                                                                    </p>
+                                                                </template>
+                                                                <el-space direction="vertical">
+                                                                    <div class="flex items-center">
+                                                                        <el-tag v-if="cover.rating>=4.5">好评如潮:{{
+                                                                            cover.rating.toFixed(2) }}/5</el-tag>
+                                                                        <!-- 其他评分显示方式按需添加 -->
+                                                                        <el-tag v-else-if="cover.ratingCount===0"
+                                                                            class="ml-2" type="info"
+                                                                            class="text-sm">暂时没有评分</el-tag>
+                                                                    </div>
+                                                                    <el-rate size="small" :value="cover.rating"
+                                                                        @change="updateRating(cover.bvid, $event)" />
+                                                                </el-space>
+                                                            </el-popover>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </el-space>
+                                    </div>
+
+
+                                    <el-space fill="fill">
+                                        <div
+                                            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
+                                            <div v-for="cover in sortedcovers" :key="`cover-${cover.id}`"
+                                                class="bg-gray-200 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
+                                                <a :href="'https://www.bilibili.com/video/' + cover.bvid"
+                                                    target="_blank">
+                                                    <div class="bg-sky-300">
+                                                        <img :src="cover.url" alt="视频封面" class="cover">
+                                                        <el-popover placement="bottom-start" :width="200"
+                                                            trigger="hover" :content="cover.description">
+                                                            <template #reference>
+                                                                <p class="cover-description">{{
+                                                                    cover.description }}</p>
+                                                            </template>
+                                                            <el-space direction="vertical">
+                                                                <div class="flex items-center">
+                                                                    <el-tag v-if="cover.rating>=4.5">
+                                                                        好评如潮:{{ cover.rating.toFixed(2) }}/5
+                                                                    </el-tag>
+                                                                    <el-tag v-else-if="cover.rating>=3.5" class="ml-2"
+                                                                        type="success">特别好评:{{
+                                                                        cover.rating.toFixed(2)
+                                                                        }}/5</el-tag>
+                                                                    <el-tag v-else-if="cover.rating>=3" class="ml-2"
+                                                                        type="info">多半好评:{{
+                                                                        cover.rating.toFixed(2)
+                                                                        }}/5</el-tag>
+                                                                    <el-tag v-else-if="cover.rating>=1.5" class="ml-2"
+                                                                        type="warning" class="text-sm">多半差评:{{
+                                                                        cover.rating.toFixed(2)
+                                                                        }}/5</el-tag>
+                                                                    <el-tag v-else-if="cover.ratingCount===0"
+                                                                        class="ml-2" type="info"
+                                                                        class="text-sm">暂时没有评分</el-tag>
+                                                                    <el-tag v-else class="ml-2" type="danger">差评如潮:{{
+                                                                        cover.rating.toFixed(2)
+                                                                        }}/5</el-tag>
+
+                                                                </div>
+                                                                <el-rate size="small" :value="cover.rating"
+                                                                    @change="updateRating(cover.bvid, $event)" />
+
+
+                                                            </el-space>
+
+                                                        </el-popover>
+
+                                                    </div>
+
+
+                                                </a>
+                                            </div>
+
+                                        </div>
+
+                                    </el-space>
+
+
+
+
+                                </div>
+                                <div v-else>
+                                    <el-empty />
+                                </div>
+
+                            </div>
+                        </el-space>
+
+                    </el-main>
+                    <el-footer class="bg-blue-600 h-16 fixed bottom-0 left-0 right-0">
+                        <el-text class="mx-1" type="primary">Made with <3< /el-text>
+                                </br>
+                                <el-link href="index.html" target="_blank" class="mx-1" type="primary">Home</el-link>
+                                <el-link href="about.html" target="_blank" class="mx-1" type="primary">About</el-link>
+                    </el-footer>
+
+                </el-container>
+
+            </el-container>
+        </el-container>
     </div>
-
-
-
-
-
-
-    <script>
-        const store = Vuex.createStore({
-            state() {
-                return {
-                    show: false,
-                    inputText: '', // 输入框的内容
-                    inputUrl: '', // URL输入框的内容
-                    inputCategory: '', // 分类选择器的值
-                    submitSuccess: false, // 投稿成功状态
-                    submitMessage: null,
-                };
-            },
-            mutations: {
-                toggleShow(state) {
-                    state.show = !state.show;
-                },
-                hideInputBox(state) {
-                    state.show = false;
-                },
-                updateInputText(state, newText) {
-                    state.inputText = newText;
-                },
-                updateInputUrl(state, newUrl) { // 更新URL输入框的内容
-                    state.inputUrl = newUrl;
-                },
-                updateInputCategory(state, newCategory) { // 更新分类选择器的值
-                    state.inputCategory = newCategory;
-                },
-                clearInputText(state) {
-                    state.inputText = '';
-                },
-                submit(state) {
-                    // 设置投稿成功状态和消息
-                    state.submitSuccess = true;
-                    state.submitMessage = '投稿成功!';
-
-                    // 延迟清除提交成功信息和状态
-                    setTimeout(() => {
-                        state.submitSuccess = false;
-                        state.submitMessage = null;
-                        state.show = false;
-                    }, 2000);
-                },
-
-                resetSubmitSuccess(state) {
-                    state.submitSuccess = false;
-                }
-            },
-            actions: {
-                async submitPost({ commit, state }, payload) {
-                    try {
-                        const response = await axios.post('http://localhost:8080/api/post/bili', payload);
-                        if (response.status == 200) {
-                            // 清空输入框和其他输入
-                            state.inputUrl = '';
-                            state.inputCategory = '';
-                            // 设置投稿成功状态，调用 'submit' mutation
-                            commit('submit');
-                        } else {
-                            console.error('Submit failed with status: ', response.status);
-                        }
-                    } catch (error) {
-                        console.error(error);
-                    }
-                },
-            }
-
-        });
-
-
-        const nav = Vue.createApp({
-            data() {
-                return {
-                    inputText: '', // 输入框的内容
-                    searchTerm: '', // 搜索框的内容
-                };
-            },
-            methods: {
-                search: function () {
-                    window.location.href = `search.html?s=${this.searchTerm}`;
-                },
-                showInputBox() {
-                    this.$store.commit('toggleShow');
-                },
-                hideInputBox() {
-                    this.$store.commit('toggleShow');
-                },
-            },
-        });
-
-        nav.use(store);
-        nav.use(ElementPlus);
-        nav.mount('#nav');
-
-
-        const app = Vue.createApp({
-            data() {
-                return {
-                    loaded: false, // 是否加载完成的标志位
-                    bvid: '', // 视频的BV号
-                    covers: [], // 存储视频封面的数据
-                    groupedCovers: [],
-                    rowIndex: 1,
-                    options: [],    // 分类选择器的选项
-
-                };
-            },
-            watch: {
-                covers(newCovers) {
-                    this.groupedCovers = this.groupCovers(newCovers);
-                },
-            },
-            computed: {
-                shownCovers() {
-                    return this.covers.slice(0, this.rowIndex * 4);
-                }
-            },
-            methods: {
-                showInputBox() {
-                    this.$store.commit('toggleShow');
-                },
-                submit() {
-                    this.$store.dispatch('submitPost', {
-                        url: this.$store.state.inputUrl,
-                        category: this.$store.state.inputCategory
-                    }).then(() => {
-                        this.$store.commit('resetSubmitSuccess');
-                    })
-                },
-                groupCovers(covers) {
-                    let grouped = {};
-                    covers.forEach((cover) => {
-                        if (!(cover.category in grouped)) {
-                            grouped[cover.category] = [];
-                        }
-                        grouped[cover.category].push(cover);
-                    });
-
-                    // 将每个分类的封面限制为前 12 个
-                    for (let category in grouped) {
-                        grouped[category] = grouped[category].slice(0, 12);
-                    }
-
-                    return Object.entries(grouped).map(([category, covers]) => ({ category, covers }));
-                },
-                loadNextRow() {
-                    if (this.rowIndex * 4 < this.covers.length) {
-                        this.rowIndex++;
-                    }
-                },
-                onScroll() {
-                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                    const windowHeight = window.innerHeight;
-                    const documentHeight = document.documentElement.scrollHeight;
-
-                    if (scrollTop + windowHeight >= documentHeight - 10) {
-                        this.loadNextRow();
-                    }
-                },
-                loadMore(category) {
-                    // 在这里加载更多的封面，例如向服务器发送请求
-                    // 假设新加载的封面是这样的：
-
-                    let newCovers = [
-
-                        // ...
-                    ];
-
-                    // 将新加载的封面添加到对应的分类中
-                    this.covers.push(...newCovers);
-
-                    // 移除封面的限制，并更新 groupedCovers 数据
-                    this.groupedCovers = this.groupedCovers.map(group => {
-                        if (group.category === category) {
-                            // 如果是当前分类，添加新的封面
-                            return { category, covers: [...group.covers, ...newCovers] };
-                        } else {
-                            // 否则，保持封面的限制
-                            return group;
-                        }
-                    });
-                },
-
-            },
-
-            mounted() {
-                setTimeout(() => {
-                    // 在这里获取视频封面的数据，例如从服务器获取
-                    // 假设获取到的数据是这样的：
-
-                    fetch('http://localhost:8080/api/getvideo')
-                        .then(response => response.json())
-                        .then(data => {
-                            // 处理返回的视频数据
-                            this.covers = data;
-
-                            // 使用 Set 数据结构去除重复的 category
-                            const categorySet = new Set(data.map(item => item.category));
-
-                            // 将 Set 转换为数组，并映射到 options 数组中
-                            this.options = Array.from(categorySet).map(category => {
-                                return { value: category, label: category };
-                            });
-                        });
-
-
-
-
-                    this.loaded = true;
-                    this.groupedCovers = this.groupCovers(this.covers);
-                }, 2000);
-                window.addEventListener('scroll', this.onScroll);
-            },
-            unmounted() {
-                window.removeEventListener('scroll', this.onScroll);
-            },
-
-
-
-
-        })
-        app.use(ElementPlus)
-        app.use(store);
-        app.mount('#app');
-    </script>
-
-    <style>
-        @media (min-width: 768px) {
-
-            main {
-                margin-left: 56px;
-                /* 导航栏的宽度 */
-            }
-        }
-
-        @media (max-width: 767px) {
-
-
-            main {
-                margin: 0 auto;
-                /* 居中 */
-            }
-        }
-
-        #main.center {
-            display: flex;
-            justify-content: center;
-        }
-
-
-        ul li:hover {
-            transform: scale(1.01);
-            transition: transform 0.2s ease-in-out;
-        }
-
-        .separator {
-            width: calc(100% + 1rem);
-            margin-left: -0.5rem;
-            margin-right: -0.5rem;
-            margin-bottom: 0.5rem;
-            /* 增加这一行来控制与下方内容的距离 */
-        }
-
-
-        .cover-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 40px;
-            /* 或你希望的高度 */
-            width: 20px;
-            /* 或你希望的宽度 */
-            overflow: hidden;
-        }
-
-        .cover {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            /* 让图片铺满整个容器 */
-        }
-
-        .bw-mask {
-            filter: grayscale(100%);
-        }
-
-        .cover-description {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-top: 0.05rem;
-            font-size: 3px;
-            color: #333;
-        }
-    </style>
 </body>
+<script>
+    const ElLoading = ElementPlus.ElLoading;
 
-<footer>
-    <p class="text-lg text-center">test</p>
-</footer>
+    const app = Vue.createApp({
+        data() {
+            return {
+                inputText: '',
+                loaded: false,
+                bvid: '',
+                covers: [],
+                groupedCovers: [],
+                rowIndex: 1,
+                options: [],
+                searchTerm: '',
+                show: false,
+                inputUrl: '',
+                inputCategory: '',
+                submitSuccess: false,
+                submitMessage: null,
+                dialogVisible: false,
+                rating: 5,
+                sortedcovers: [],
+                carouselcovers: [],
+            };
+        },
+        methods: {
+            search: function () {
+                if (!this.searchTerm) {
+                    alert('搜索内容不能为空!');
+                    return;
+                }
+                window.location.href = `search.html?s=${this.searchTerm}`;
+            },
+            openDialog() {
+                console.log('openDialog');
+                this.dialogVisible = true
+            },
+            closeDialog() {
+                this.dialogVisible = false
+            },
+            toggleShow() {
+
+                this.show = !this.show;
+                console.log('toggleShow to ' + this.show);
+            },
+            hideInputBox() {
+                this.show = false;
+            },
+            handleConfirm() {
+                this.dialogVisible = false;
+                this.hideInputBox();
+            },
+            updateRating(bvid, rating) {
+                // Update rating locally
+                let cover = this.covers.find(cover => cover.bvid === bvid);
+
+                if (cover === undefined) {
+                    console.error(`No video with bvid: ${bvid} found.`);
+                    return;
+                }
+
+                console.log(`Update rating of ${bvid} to ${rating}`);
+
+
+                axios.put('http://localhost:8080/api/put/ratebybvid', {
+                    bvid: cover.bvid,
+                    rating: rating,
+                }).then(response => {
+                    cover.rating = response.data.rating;
+                }).catch(error => {
+                    console.error(error);
+                });
+            },
+            groupCovers(covers) {
+                let grouped = {};
+                covers.forEach((cover) => {
+                    if (!(cover.category in grouped)) {
+                        grouped[cover.category] = [];
+                    }
+                    grouped[cover.category].push(cover);
+                });
+                //按rating排序
+                for (let category in grouped) {
+                    grouped[category] = grouped[category].sort((a, b) => {
+                        return b.rating - a.rating;
+                    });
+                }
+
+                // 将每个分类的封面限制为前 12 个
+                for (let category in grouped) {
+                    grouped[category] = grouped[category].slice(0, 12);
+                }
+
+                return Object.entries(grouped).map(([category, covers]) => ({ category, covers }));
+            },
+
+            async submit() {
+                if (!this.inputUrl || !this.inputCategory) {
+                    this.submitSuccess = false;
+                    this.submitMessage = 'URL和分类不能为空!';
+                    setTimeout(() => {
+                        this.submitSuccess = false;
+                        this.submitMessage = null;
+                    }, 2000);
+                    return;
+                }
+                try {
+                    const response = await axios.post('http://localhost:8080/api/post/bili', {
+                        url: this.inputUrl,
+                        category: this.inputCategory
+                    });
+                    if (response.status == 200) {
+                        this.inputUrl = '';
+                        this.inputCategory = '';
+
+                        this.submitSuccess = true;
+                        this.submitMessage = '投稿成功!';
+
+                        setTimeout(() => {
+                            this.submitSuccess = false;
+                            this.submitMessage = null;
+                            this.show = false;
+                        }, 2000);
+                    } else {
+                        console.error('Submit failed with status: ', response.status);
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            },
+        },
+        mounted() {
+            const loading = ElLoading.service({
+                lock: true,
+                text: 'Loading',
+                background: 'rgba(0, 0, 0, 0.7)',
+            });
+            setTimeout(() => {
+                fetch('http://localhost:8080/api/getvideo')
+                    .then(response => response.json())
+                    .then(data => {
+                        this.covers = data;
+                        console.log(data);
+                        console.log('this.covers1');
+                        console.log(this.covers);
+
+                        const categorySet = new Set(data.map(item => item.category));
+
+                        this.options = Array.from(categorySet).map(category => {
+                            return { value: category, label: category };
+                        });
+                    }).then(() => {
+                        this.groupedCovers = this.groupCovers(this.covers);
+                        console.log('this.covers2');
+                        console.log(this.covers);
+                        console.log(this.groupedCovers);
+                        //按时间先后排序
+                        this.sortedcovers = this.covers.sort((a, b) => {
+                            return new Date(b.time) - new Date(a.time);
+                        });
+                        console.log('this.sortedcovers');
+                        console.log(this.sortedcovers);
+                        this.carouselcovers = this.covers.sort((a, b) => {
+                            return b.rating - a.rating;
+                        }).slice(0, 4);
+                        console.log('this.carouselcovers');
+                        console.log(this.carouselcovers);
+                        this.loaded = true;
+                        loading.close();
+                    });
+            }, 2000);
+        },
+    });
+
+    app.use(ElementPlus);
+    app.mount('#app');
+</script>
+
+<style>
+    .cover {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        /* 让图片铺满整个容器 */
+    }
+
+    .bw-mask {
+        filter: grayscale(100%);
+    }
+
+    .cover-description {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-top: 0.05rem;
+        font-size: 3px;
+        color:
+            #333;
+    }
+</style>
+
+</html>
