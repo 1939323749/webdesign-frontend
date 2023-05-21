@@ -17,10 +17,10 @@
     <div id="app">
         <el-container>
             <el-header>
-                <header class="h-16 flex justify-between items-center bg-blue-600 p-4 fixed top-0 right-0 left-0">
+                <header class="header h-16 flex justify-between items-center bg-blue-600 p-4 fixed top-0 right-0 left-0">
                     <div id="logo" class="flex items-center">
                         <div class="flex items-center">
-                            <p>首页</p>
+                            <p class="text-lg text-white">首页</p>
                         </div>
                     </div>
                     <div class="flex items-center space-x-4">
@@ -295,7 +295,7 @@
 
                     </el-main>
                     <el-footer class="bg-blue-600 h-16 fixed bottom-0 left-0 right-0">
-                        <el-text class="mx-1" type="primary">Made with <3< /el-text>
+                        <el-text class="mx-1" type="primary">Made with <3 </el-text>
                                 </br>
                                 <el-link href="index.html" target="_blank" class="mx-1" type="primary">Home</el-link>
                                 <el-link href="about.html" target="_blank" class="mx-1" type="primary">About</el-link>
@@ -330,7 +330,7 @@
                 rating: 5,
                 sortedcovers: [],
                 carouselcovers: [],
-                itemsPerPage: 4,
+                itemsPerPage: 12,
                 currentPage: 1,
             };
         },
@@ -519,6 +519,7 @@
         color:
             #333;
     }
+
 </style>
 
 </html>
